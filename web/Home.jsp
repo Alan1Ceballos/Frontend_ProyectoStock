@@ -35,6 +35,10 @@
         <% } %>
     </p>
 
+    <form action="historialpedidos" method="GET">
+        <button type="submit">Ver Historial de Pedidos</button>
+    </form>
+
     <!-- Enlace para cerrar sesión -->
     <a href="LogoutServlet">Cerrar sesión</a>
 </body>
