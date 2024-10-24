@@ -9,15 +9,15 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
 
 /* Asegura que el html y el body ocupen toda la altura */
 html, body {
-    height: 100%; /* Asegura que el body ocupe toda la altura */
-    margin: 0; /* Elimina márgenes por defecto */
+    height: 100%;
+    margin: 0;
 }
 
 body {
-    display: flex; /* Usa flexbox para el layout */
-    flex-direction: column; /* Coloca los hijos en una columna */
-    font-family: Arial, sans-serif; /* Tipografía general */
-    background-color: #f0f0f0; /* Color de fondo general */
+    display: flex;
+    flex-direction: column;
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
 }
 
 /* Estilos del encabezado */
@@ -53,17 +53,20 @@ h1 {
 
 /* Sección de contenido */
 .contenido {
-    flex: 1; /* Permite que el contenido crezca y ocupe espacio disponible */
-    margin: 0 20px; /* Margen lateral de 20px */
+    flex-grow: 1;  /* Asegura que la parte .contenido crezca y ocupe espacio */
+    margin: 0 20px;
 }
-
 
 /* Estilos del pie de página */
 footer {
-    text-align: center; /* Centrar el texto del pie de página */
-    background-color: #333; /* Fondo oscuro para el pie de página */
-    color: white; /* Color de texto blanco */
-    padding: 10px 0; /* Espacio interno del pie de página */
+    text-align: left;
+    background-color: #333;
+    color: white;
+    padding: 10px 0;
+    position: relative;  /* Asegura que el footer se quede al fondo */
+    bottom: 0;
+    width: 100%;
+    margin-top: 20px
 }
 
 /* Estilos para la tabla */
