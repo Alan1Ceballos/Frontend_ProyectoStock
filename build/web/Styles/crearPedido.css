@@ -1,0 +1,113 @@
+/* Estilo general de la página */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+}
+
+h2 {
+    color: #4CAF50;
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Estilos del formulario */
+form {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 5px;
+    max-width: 600px;
+    margin: 0 auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para etiquetas e inputs */
+label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 10px;
+}
+
+input[type="number"],
+select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+/* Estilos para el botón de Añadir al Carrito */
+button[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+/* Estilo para el botón de Ver Carrito */
+.ver-carrito {
+    background-color: #2196F3;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    display: inline-block;
+    margin-left: 10px;
+    border-radius: 4px;
+}
+
+.ver-carrito:hover {
+    background-color: #0b7dda;
+}
+
+/* Estilo para el botón de Cancelar */
+button[type="reset"] {
+    background-color: #f44336;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-left: 10px;
+}
+
+button[type="reset"]:hover {
+    background-color: #d32f2f;
+}
+
+/* Estilos adicionales */
+p {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#total {
+    color: #4CAF50;
+}
+
+select[multiple] {
+    height: auto;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* Estilo del contenedor de la página */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
