@@ -22,7 +22,7 @@ body {
 
 /* Estilos del encabezado */
 header {
-    background-color: #333; /* Fondo negro para el encabezado */
+    background-color: #212529; /* Fondo negro para el encabezado */
     color: white; /* Color de texto blanco */
     padding: 20px 0; /* Espacio interno superior e inferior */
     margin-bottom: 20px; /* Espacio inferior del encabezado */
@@ -61,9 +61,10 @@ h1 {
 /* Estilos del pie de página */
 footer {
     text-align: center; /* Centrar el texto del pie de página */
-    background-color: #333; /* Fondo oscuro para el pie de página */
+    background-color: #212529; /* Fondo oscuro para el pie de página */
     color: white; /* Color de texto blanco */
     padding: 10px 0; /* Espacio interno del pie de página */
+    margin-top: 20px
 }
 
 /* Estilos para la tabla */
@@ -96,15 +97,9 @@ tr:hover {
 .btn {
     display: inline-block;
     padding: 10px 15px;
-    background-color: #4CAF50;
-    color: white;
     text-decoration: none;
     border-radius: 5px;
     border: none; /* Sin borde */
     cursor: pointer; /* Cambiar cursor al pasar por encima */
     font-weight: bold; /* Texto en negrita */
-}
-
-.btn:hover {
-    background-color: #45a049; /* Color más oscuro al pasar el mouse */
 }
