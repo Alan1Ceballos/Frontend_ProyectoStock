@@ -1,4 +1,4 @@
-/* Estilo general de la página */
+/* Asegura que el html y el body ocupen toda la altura */
 html, body {
     height: 100%; /* Asegura que el body ocupe toda la altura */
     margin: 0; /* Elimina márgenes por defecto */
@@ -71,7 +71,7 @@ footer {
 }
 
 .card {
-    height: 350px; /* Altura fija para cada carta */
+    height: 250px; /* Altura fija para cada carta */
     width: 300px; /* Ancho fijo para cada carta */
 }
 

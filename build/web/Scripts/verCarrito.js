@@ -42,7 +42,6 @@ document.addEventListener("DOMContentLoaded", function () {
         actualizarTotal();
     }
 
-
     // Función para actualizar el total del carrito
     function actualizarTotal() {
         const total = carrito.reduce((sum, item) => sum + item.price * item.quantity, 0);

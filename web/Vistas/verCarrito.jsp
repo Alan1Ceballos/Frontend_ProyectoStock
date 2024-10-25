@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <title>Ver Carrito</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="Styles/verCarrito.css"> <!-- CSS específico para verCarrito -->
+    <link rel="stylesheet" type="text/css" href="Styles/verCarrito.css">
     <script src="Scripts/verCarrito.js"></script>
 </head>
 <body>
@@ -15,7 +15,7 @@
         </div>
     </header>
 
-    <div class="container mt-4">
+    <div class="container mt-4 flex-grow-1">
         <div id="carritoContainer" class="row">
             <!-- Aquí se llenarán las cartas de productos con JavaScript -->
         </div>
