@@ -1,66 +1,38 @@
-<%@page import="java.util.ArrayList"%>
-<%@page import="logica.Clases.DetallePedido"%>
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Carrito</title>
-        <link rel="stylesheet" type="text/css" href="Styles/verCarrito.css">
-    </head>
-    <body>
-        <h2>Tu Carrito</h2>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ver Carrito</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="Styles/verCarrito.css"> <!-- CSS específico para verCarrito -->
+    <script src="Scripts/verCarrito.js"></script>
+</head>
+<body>
+    <header class="d-flex align-items-center justify-content-between p-3 bg-dark text-white">
+        <div class="encabezado">
+            <h1>Carrito de Compras</h1>
+        </div>
+    </header>
 
-        <table border="1">
-            <tr>
-                <th>Producto</th>
-                <th>Precio</th>
-                <th>Cantidad</th>
-                <th>Total</th>
-                <th>Acciones</th> <!-- Nueva columna para el botón eliminar -->
-            </tr>
-            <%
-                ArrayList<DetallePedido> carrito = (ArrayList<DetallePedido>) session.getAttribute("carrito");
-                if (carrito != null && !carrito.isEmpty()) {
-                    double totalCarrito = 0;
-                    int index = 0; // Para identificar cada producto en el carrito
-                    for (DetallePedido detalle : carrito) {
-                        double totalProducto = detalle.getProducto().getPrecioVenta() * detalle.getCantidad();
-                        totalCarrito += totalProducto;
-            %>
-            <tr>
-                <td><%= detalle.getProducto().getNombre()%></td>
-                <td>$<%= detalle.getProducto().getPrecioVenta()%></td>
-                <td><%= detalle.getCantidad()%></td>
-                <td>$<%= totalProducto%></td>
-                <td>
-                    <!-- Formulario para eliminar el producto del carrito -->
-                    <form action="verCarrito" method="get"> <!-- URL del servlet corregida -->
-                        <input type="hidden" name="eliminarIndex" value="<%= index%>">
-                        <button type="submit">Eliminar</button>
-                    </form>
-                </td>
+    <div class="container mt-4">
+        <div id="carritoContainer" class="row">
+            <!-- Aquí se llenarán las cartas de productos con JavaScript -->
+        </div>
 
-            </tr>
-            <%
-                    index++;
-                }
-            %>
-            <tr>
-                <td colspan="3">Total</td>
-                <td>$<%= totalCarrito%></td>
-                <td></td>
-            </tr>
-            <%
-            } else {
-            %>
-            <tr>
-                <td colspan="5">El carrito está vacío</td>
-            </tr>
-            <%
-                }
-            %>
-        </table>
+        <div class="mt-4">
+            <h5>Total del Carrito: $<span id="carritoTotal">0.00</span></h5>
+            <button class="btn btn-danger" id="limpiarCarrito">Limpiar Carrito</button>
+            <button class="btn btn-success" id="confirmarPedido">Confirmar Pedido</button>
+            <a href="crearPedido" class="btn btn-secondary">Regresar</a>
+        </div>
+    </div>
 
-        <a href="crearPedido">Seguir comprando</a>
-    </body>
+    <footer class="text-center mt-4">
+        <p>&copy; 2024 Programación de Aplicaciones</p>
+    </footer>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>

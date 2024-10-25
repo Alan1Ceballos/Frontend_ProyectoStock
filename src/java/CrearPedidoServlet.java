@@ -11,10 +11,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import logica.Clases.Categoria;
 import logica.Clases.Cliente;
 import logica.Clases.DetallePedido;
 import logica.Clases.Producto;
 import logica.Fabrica;
+import logica.Interfaces.IControladorCategoria;
 import logica.Interfaces.IControladorCliente;
 import logica.Interfaces.IControladorProducto;
 
@@ -28,21 +30,27 @@ public class CrearPedidoServlet extends HttpServlet {
     Fabrica fabrica = Fabrica.getInstance();
     IControladorCliente controladorCliente = fabrica.getIControladorCliente();
     IControladorProducto controladorProducto = fabrica.getIControladorProducto();
+    IControladorCategoria controladorCategoria = fabrica.getIControladorCategoria();
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         // Crear una instancia para obtener los clientes y servicios
         ArrayList<Cliente> listaDeClientes = controladorCliente.listarClientes();
-        ArrayList<Producto> listaDeProductos = controladorProducto.listarProductos();
+        ArrayList<Producto> listaDeProductos = controladorProducto.listarProductosActivos();
+        
+        // Obtener las categorías activas
+        ArrayList<Categoria> listaDeCategorias = controladorCategoria.listarCategoriasActivas();
 
         // Pasar la lista de clientes al JSP
         request.setAttribute("clientes", listaDeClientes);
         request.setAttribute("productos", listaDeProductos);
+        
+        // Pasar la lista de categorías al JSP
+        request.setAttribute("categorias", listaDeCategorias);
 
         // Redirigir al JSP para mostrar el formulario
         request.getRequestDispatcher("Vistas/crearPedido.jsp").forward(request, response);
-
     }
 
     @Override

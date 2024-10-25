@@ -1,91 +1,114 @@
 /* Estilo general de la página */
+html, body {
+    height: 100%; /* Asegura que el body ocupe toda la altura */
+    margin: 0; /* Elimina márgenes por defecto */
+}
+
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
-    margin: 0;
-    padding: 20px;
-    color: #333;
+    display: flex; /* Usa flexbox para el layout */
+    flex-direction: column; /* Coloca los hijos en una columna */
+    font-family: Arial, sans-serif; /* Tipografía general */
+    background-color: #f0f0f0; /* Color de fondo general */
 }
 
-h2 {
-    color: #4CAF50;
-    font-size: 24px;
-    text-align: center;
-    margin-bottom: 20px;
+/* Estilos del encabezado */
+header {
+    background-color: #212529; /* Fondo oscuro para el encabezado */
+    color: white; /* Color de texto blanco */
+    padding: 20px 0; /* Espacio interno superior e inferior */
+    margin-bottom: 20px; /* Espacio inferior del encabezado */
 }
 
-/* Estilo de la tabla */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px auto;
-    background-color: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    max-width: 800px;
+.encabezado {
+    display: flex; /* Usar flexbox para alinear elementos en el encabezado */
+    align-items: center; /* Centrar verticalmente los elementos */
+    justify-content: space-between; /* Espaciado entre el título y la barra de búsqueda */
+    margin: 0 20px; /* Margen lateral de 20px */
 }
 
-th, td {
-    padding: 12px;
-    text-align: center;
-    border: 1px solid #ddd;
+/* Estilo del título */
+h1 {
+    margin: 0; /* Eliminar márgenes para evitar desplazamientos no deseados */
+    font-size: 2em; /* Ajustar el tamaño de la fuente si es necesario */
 }
 
-th {
-    background-color: #4CAF50;
-    color: white;
-    font-weight: bold;
+/* Sección de contenido */
+.container {
+    flex: 1; /* Permite que el contenido crezca y ocupe espacio disponible */
 }
 
-td {
-    font-size: 16px;
-}
-
-/* Estilo para el botón de eliminar */
-button[type="submit"] {
-    background-color: #f44336;
-    color: white;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-button[type="submit"]:hover {
-    background-color: #d32f2f;
-}
-
-/* Estilo para el enlace "Seguir comprando" */
-a {
-    display: block;
-    text-align: center;
+/* Estilos del pie de página */
+footer {
+    text-align: center; /* Centrar el texto del pie de página */
+    background-color: #212529; /* Fondo oscuro para el pie de página */
+    color: white; /* Color de texto blanco */
+    padding: 10px 0; /* Espacio interno del pie de página */
     margin-top: 20px;
-    background-color: #2196F3;
-    color: white;
-    padding: 10px 20px;
-    text-decoration: none;
-    border-radius: 4px;
-    max-width: 200px;
-    margin-left: auto;
-    margin-right: auto;
 }
 
-a:hover {
-    background-color: #0b7dda;
+/* Contenedor de productos */
+#productosContainer {
+    display: flex; /* Permitir que los elementos se alineen en fila */
+    overflow-x: auto; /* Activar desplazamiento horizontal */
+    scrollbar-width: thin; /* Para navegadores que soportan esta propiedad */
+    padding: 10px 0; /* Espacio vertical en el contenedor de productos */
 }
 
-/* Estilo para la fila total */
-tr:last-child td {
-    font-weight: bold;
-    background-color: #f9f9f9;
+/* Estilo de barra de búsqueda y filtros */
+.busqueda-filtros {
+    margin-bottom: 15px; /* Espacio debajo de la barra de búsqueda */
 }
 
-td[colspan="3"] {
-    text-align: right;
+.busqueda-filtros .form-select,
+.busqueda-filtros .form-control {
+    max-width: 200px; /* Ancho máximo para los select y input */
 }
 
-td[colspan="5"] {
-    text-align: center;
-    font-weight: bold;
-    color: #f44336;
+/* Estilos de las cartas de productos */
+.product-card {
+    flex: 0 0 auto; /* Mantener las cartas con un ancho fijo */
+    margin-right: 15px; /* Espacio entre cartas */
+}
+
+.card {
+    height: 350px; /* Altura fija para cada carta */
+    width: 300px; /* Ancho fijo para cada carta */
+}
+
+.card .card-body {
+    display: flex;
+    flex-direction: column; /* Asegúrate de que el contenido esté en columna */
+    justify-content: space-between; /* Espaciado entre elementos */
+    height: 100%; /* Hacer que el body ocupe toda la altura de la carta */
+}
+
+/* Estilos adicionales para botones */
+.btn-primary {
+    background-color: #007bff; /* Color de fondo para el botón */
+    border-color: #007bff; /* Color del borde */
+}
+
+.btn-primary:hover {
+    background-color: #0056b3; /* Color de fondo al pasar el mouse */
+    border-color: #0056b3; /* Color del borde al pasar el mouse */
+}
+
+.btn-danger {
+    background-color: #dc3545; /* Color de fondo para el botón de limpiar carrito */
+    border-color: #dc3545; /* Color del borde */
+}
+
+.btn-danger:hover {
+    background-color: #c82333; /* Color de fondo al pasar el mouse */
+    border-color: #bd2130; /* Color del borde al pasar el mouse */
+}
+
+.btn-success {
+    background-color: #28a745; /* Color de fondo para el botón de ver carrito */
+    border-color: #28a745; /* Color del borde */
+}
+
+.btn-success:hover {
+    background-color: #218838; /* Color de fondo al pasar el mouse */
+    border-color: #1e7e34; /* Color del borde al pasar el mouse */
 }
