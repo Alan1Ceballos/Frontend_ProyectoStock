@@ -1,8 +1,3 @@
-/* 
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/JavaScript.js to edit this template
- */
-
 function filtrarProductos() {
     const input = document.getElementById('busqueda');
     const filter = input.value.toLowerCase();
@@ -44,6 +39,18 @@ document.addEventListener("DOMContentLoaded", function () {
     const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
     updateTotalCarrito();
 
+    // Mostrar clientes en la consola cuando se selecciona uno
+    const clienteSelect = document.getElementById("cliente");
+    if (clienteSelect) {
+        clienteSelect.addEventListener("change", function () {
+            const clienteId = this.value; // Obtiene el valor del cliente seleccionado
+            console.log("Cliente ID almacenado:", clienteId); // Muestra el ID del cliente
+            localStorage.setItem("clienteId", clienteId);
+            const opciones = Array.from(this.options).map(option => option.value);
+            console.log("Clientes disponibles:", opciones); // Muestra todos los IDs de clientes
+        });
+    }
+
     // Configurar los botones de añadir al carrito
     document.querySelectorAll(".btn-add-cart").forEach(button => {
         const productId = button.dataset.id;
@@ -72,6 +79,23 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
+    // Llamada para filtrar productos al cambiar el input de búsqueda
+    const busquedaInput = document.getElementById('busqueda');
+    if (busquedaInput) {
+        busquedaInput.addEventListener('input', filtrarProductos);
+    }
+
+    // Configurar el botón de "Ver Carrito"
+    const verCarritoButton = document.getElementById("verCarrito");
+    if (verCarritoButton) {
+        verCarritoButton.addEventListener("click", () => {
+            window.location.href = "verCarrito.jsp";
+        });
+    } else {
+        console.warn("Ver Carrito button not found.");
+    }
+
+    // Funciones de carrito
     function addToCart(productId, quantity) {
         const nameElement = document.querySelector(`.product-card .btn-add-cart[data-id="${productId}"]`).closest('.product-card').querySelector('.card-title');
         const priceElement = document.querySelector(`.product-card .product-price[data-id="${productId}"]`);
@@ -135,13 +159,4 @@ document.addEventListener("DOMContentLoaded", function () {
             button.classList.replace("btn-danger", "btn-primary");
         });
     });
-
-    const verCarritoButton = document.getElementById("verCarrito");
-    if (verCarritoButton) {
-        verCarritoButton.addEventListener("click", () => {
-            window.location.href = "verCarrito.jsp";
-        });
-    } else {
-        console.warn("Ver Carrito button not found.");
-    }
 });

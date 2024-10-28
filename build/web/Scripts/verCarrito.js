@@ -8,6 +8,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
     const carritoContainer = document.getElementById("carritoContainer");
     const carritoTotalElement = document.getElementById("carritoTotal");
+    const clienteId = localStorage.getItem("clienteId"); // Recuperar el clienteId de localStorage
+
+    // Agregar un console.log para verificar el clienteId
+    console.log("Cliente ID:", clienteId);
 
     // Función para mostrar productos en el carrito
     function mostrarCarrito() {
@@ -65,11 +69,41 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        // Aquí se podría implementar la lógica para enviar el pedido al servidor.
-        alert("Pedido confirmado.");
-        localStorage.removeItem("carrito");  // Limpiar el carrito en localStorage
-        mostrarCarrito();  // Volver a mostrar el carrito vacío
+        confirmarPedido(clienteId, carrito); // Llama a la función para confirmar el pedido
     });
+
+    // Definición de la función confirmarPedido
+    function confirmarPedido(clienteId, carrito) {
+        console.log("Confirmando pedido con Cliente ID:", clienteId); // Agregado para depuración
+
+        
+        // Verificar si clienteId es nulo o indefinido
+        if (!clienteId) {
+            alert("Cliente ID no está disponible. Por favor, seleccione un cliente.");
+            return; // Salir de la función si el clienteId no es válido
+        }
+
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "verCarrito?confirmarPedido=true", true);
+
+        // Cambiar el tipo de contenido a JSON
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        // Prepara el cuerpo de la solicitud
+        const body = JSON.stringify({clienteId: clienteId, carrito: carrito});
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                alert(xhr.responseText); // Muestra el mensaje de confirmación o error
+                // Limpia el carrito en localStorage y actualiza la vista
+                localStorage.removeItem("carrito");
+                mostrarCarrito();
+                window.location.href = "crearPedido"; // Redirige a la página de creación de pedido
+            }
+        };
+
+        xhr.send(body); // Enviar la solicitud con el cuerpo
+    }
 
     // Evento para limpiar el carrito
     document.getElementById("limpiarCarrito").addEventListener("click", function () {

@@ -3,8 +3,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 
+import com.google.gson.JsonObject;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -13,6 +14,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import logica.Clases.DetallePedido;
+import logica.Clases.Pedido;
+import logica.Clases.Producto;
+import logica.Fabrica;
+import logica.Interfaces.IControladorPedido;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  *
@@ -21,70 +28,113 @@ import logica.Clases.DetallePedido;
 @WebServlet(urlPatterns = {"/verCarrito"})
 public class verCarrito extends HttpServlet {
 
+    IControladorPedido controladorPedido = Fabrica.getInstance().getIControladorPedido();
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
 
         // Obtener el carrito de la sesión
         ArrayList<DetallePedido> carrito = (ArrayList<DetallePedido>) session.getAttribute("carrito");
+        if (carrito == null) {
+            carrito = new ArrayList<>();
+            session.setAttribute("carrito", carrito);
+        }
 
         // Comprobar si hay una solicitud de eliminar un producto
         String eliminarIndexStr = request.getParameter("eliminarIndex");
         if (eliminarIndexStr != null) {
             try {
                 int eliminarIndex = Integer.parseInt(eliminarIndexStr);
-                if (carrito != null && eliminarIndex >= 0 && eliminarIndex < carrito.size()) {
+                if (eliminarIndex >= 0 && eliminarIndex < carrito.size()) {
                     carrito.remove(eliminarIndex); // Eliminar el producto del carrito
                 }
             } catch (NumberFormatException e) {
-                // Manejar el caso de que el índice no sea un número válido (opcional)
+                // Manejar el caso de que el índice no sea un número válido
             }
         }
-        
+
+        // Verificar si la solicitud es para confirmar el pedido
+        String confirmarPedido = request.getParameter("confirmarPedido");
+        if (confirmarPedido != null && confirmarPedido.equals("true")) {
+            confirmarYGuardarPedido(session, request, response);
+            return;
+        }
+
         // Pasar el carrito a la vista JSP
         request.setAttribute("carrito", carrito);
-
-        // Redirigir a la vista del carrito
         request.getRequestDispatcher("Vistas/verCarrito.jsp").forward(request, response);
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+    private void confirmarYGuardarPedido(HttpSession session, HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        try {
+            StringBuilder jsonBuffer = new StringBuilder();
+            BufferedReader reader = request.getReader();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                jsonBuffer.append(line);
+            }
+
+            JSONObject jsonObject = new JSONObject(jsonBuffer.toString());
+            int idCliente = jsonObject.getInt("clienteId");
+            JSONArray carritoArray = jsonObject.getJSONArray("carrito");
+
+            if (carritoArray.length() == 0) {
+                response.getWriter().write("El carrito está vacío. Añade productos antes de confirmar.");
+                return;
+            }
+
+//            int idVendedor = (int) session.getAttribute("vendedorId");
+            // Asignar siempre el vendedor 1 para la prueba
+            int idVendedor = 1; 
+
+            Pedido nuevoPedido = new Pedido();
+            nuevoPedido.setFechaPedido(new java.util.Date());
+            nuevoPedido.setEstado(Pedido.Estado.EN_PREPARACION);
+            nuevoPedido.setIdVendedor(idVendedor);
+            nuevoPedido.setIdCliente(idCliente);
+
+            for (int i = 0; i < carritoArray.length(); i++) {
+                JSONObject detalleObj = carritoArray.getJSONObject(i);
+                Producto producto = new Producto();
+                producto.setId(detalleObj.getInt("id"));
+
+                DetallePedido detalle = new DetallePedido();
+                detalle.setProducto(producto);
+                detalle.setCantidad(detalleObj.getInt("quantity"));
+                detalle.setPrecioVenta((float) detalleObj.getDouble("price"));
+
+                nuevoPedido.agregarDetalle(detalle);
+            }
+
+            boolean resultado = controladorPedido.agregarPedido(nuevoPedido);
+            if (resultado) {
+                response.getWriter().write("Pedido añadido exitosamente.");
+                session.removeAttribute("carrito");
+            } else {
+                response.getWriter().write("Error al añadir el pedido. Inténtelo de nuevo.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.getWriter().write("Ocurrió un error al confirmar el pedido: " + e.getMessage());
+        }
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
     @Override
     public String getServletInfo() {
         return "Short description";
-    }// </editor-fold>
-
+    }
 }

@@ -42,8 +42,16 @@ public class CrearPedidoServlet extends HttpServlet {
         // Obtener las categorías activas
         ArrayList<Categoria> listaDeCategorias = controladorCategoria.listarCategoriasActivas();
 
+        // Aquí llamamos a la función para obtener el ID del cliente por nombre
+        ArrayList<Integer> idsClientes = new ArrayList<>();
+        for (Cliente cliente : listaDeClientes) {
+            int idCliente = controladorCliente.obtenerIdClientePorNombre(cliente.getNom_empresa());
+            idsClientes.add(idCliente);
+        }
+        
         // Pasar la lista de clientes al JSP
         request.setAttribute("clientes", listaDeClientes);
+        request.setAttribute("idsClientes", idsClientes);
         request.setAttribute("productos", listaDeProductos);
         
         // Pasar la lista de categorías al JSP

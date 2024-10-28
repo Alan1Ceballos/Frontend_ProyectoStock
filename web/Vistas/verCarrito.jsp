@@ -23,7 +23,7 @@
         <div class="mt-4">
             <h5>Total del Carrito: $<span id="carritoTotal">0.00</span></h5>
             <button class="btn btn-danger" id="limpiarCarrito">Limpiar Carrito</button>
-            <button class="btn btn-success" id="confirmarPedido">Confirmar Pedido</button>
+            <button class="btn btn-success" id="confirmarPedido" onclick="confirmarPedido(localStorage.getItem('clienteId'), JSON.parse(localStorage.getItem('carrito')) || [])">Confirmar Pedido</button>
             <a href="crearPedido" class="btn btn-secondary">Regresar</a>
         </div>
     </div>
