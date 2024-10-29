@@ -34,7 +34,7 @@
             ¡Hola, <%= usuario %>! Has iniciado sesión correctamente.
         <% } %>
     </p>
-
+    
     <!-- Enlace para cerrar sesión -->
     <a href="LogoutServlet">Cerrar sesión</a>
 </body>

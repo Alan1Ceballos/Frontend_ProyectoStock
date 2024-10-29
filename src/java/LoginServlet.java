@@ -14,7 +14,6 @@ import javax.servlet.http.HttpSession;
 import logica.Fabrica;
 import logica.Interfaces.IControladorVendedor;
 
-
 @WebServlet(urlPatterns = {"/login"})
 public class LoginServlet extends HttpServlet {
 
@@ -35,6 +34,11 @@ public class LoginServlet extends HttpServlet {
             if (validateUsuario(userName, password)) {
                 HttpSession session = request.getSession();
                 session.setAttribute("usuario", userName);
+                
+                // Obtiene el ID del vendedor y lo guarda en la sesión
+                Integer idVendedor = getVendedorId(userName);
+                session.setAttribute("idVendedor", idVendedor);
+                
                 response.sendRedirect("Home.jsp");
             } else {
                 request.setAttribute("errorMessage", "Usuario o contraseña incorrectos.");
@@ -47,6 +51,10 @@ public class LoginServlet extends HttpServlet {
         }
     }
 
+    private Integer getVendedorId(String username) {
+        IControladorVendedor controladorVendedor = Fabrica.getInstance().getIControladorVendedor();
+        return controladorVendedor.obtenerIdPorUsuario(username);
+    }
 
     private boolean validateUsuario(String username, String password) {
         //obtenemos instancia del controlador de vendedores

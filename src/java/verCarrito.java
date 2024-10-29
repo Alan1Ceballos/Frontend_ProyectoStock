@@ -84,10 +84,8 @@ public class verCarrito extends HttpServlet {
                 response.getWriter().write("El carrito está vacío. Añade productos antes de confirmar.");
                 return;
             }
-
-//            int idVendedor = (int) session.getAttribute("vendedorId");
-            // Asignar siempre el vendedor 1 para la prueba
-            int idVendedor = 1; 
+            
+            int idVendedor = (int) session.getAttribute("idVendedor");
 
             Pedido nuevoPedido = new Pedido();
             nuevoPedido.setFechaPedido(new java.util.Date());
