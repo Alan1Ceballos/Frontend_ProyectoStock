@@ -113,7 +113,7 @@
                             <tr>
                                 <td><%= pedido.getIdentificador() %></td>
                                 <td><%= pedido.getFechaPedido() %></td>
-                                <td><%= estadoPedido %></td>
+                                <td class="estadoPedido" data-estado="<%= estadoPedido %>"><%= estadoPedido %></td>
                                 <td><%= pedido.getTotal() %></td>
                                 <td><%= nombreCliente != null ? nombreCliente : "Desconocido" %></td>
                                 <td>
@@ -121,13 +121,13 @@
                                         <input type="hidden" name="idPedido" value="<%= pedido.getIdentificador() %>">
                                         <button type="submit" class="btn">Ver Detalles</button>
                                     </form>
-                                    <form action="${pageContext.request.contextPath}/modificarPedido" method="get" style="display:inline;">
+                                    <form action="${pageContext.request.contextPath}/Vistas/modificarPedido.jsp" method="post" style="display:inline;">
                                         <input type="hidden" name="idPedido" value="<%= pedido.getIdentificador() %>">
                                         <button type="submit" class="btn">Modificar Pedido</button>
                                     </form>
-                                    <form action="${pageContext.request.contextPath}/cancelarPedido" method="post" style="display:inline;">
-                                        <input type="hidden" name="idPedido" value="<%= pedido.getIdentificador() %>">
-                                        <button type="submit" class="btn">Cancelar Pedido</button>
+                                    <form action="${pageContext.request.contextPath}/cancelarPedido" method="post" style="display:inline;" onsubmit="return confirmarCancelacion();">
+                                        <input type="hidden" class="idPedido" name="idPedido" value="<%= pedido.getIdentificador() %>">
+                                        <button type="submit" id="cancelarPedidoBtn" class="btn">Cancelar Pedido</button>
                                     </form>
                                 </td>
                             </tr>
@@ -144,6 +144,43 @@
             </tbody>
         </table>
     </div>
+            
+            <script>
+                
+                function confirmarCancelacion() {                   
+                    var idPedido = document.querySelector(".idPedido").value;
+                    // Usar el ID en la alerta de confirmación
+                    return confirm("¿Estás seguro de que deseas cancelar el pedido con ID: " + idPedido + "?");
+                }
+            </script>
+            <script>
+                // Este script se ejecuta cuando el DOM está completamente cargado
+                document.addEventListener("DOMContentLoaded", function() {
+                    // Obtener todas las filas de la tabla
+                    var filas = document.querySelectorAll("#tablaPedidos tbody tr");
+
+                    // Iterar sobre cada fila
+                    filas.forEach(function(fila) {
+                        // Obtener la celda de estado en la fila actual
+                        var estadoCelda = fila.querySelector(".estadoPedido");
+                        var estadoPedido = estadoCelda.getAttribute("data-estado");
+
+                        // Si el estado es CANCELADO, deshabilitar el botón y cambiar el color de la celda de estado
+                        if (estadoPedido === "Cancelado") {
+                            // Cambiar el color de la celda de estado a rojo
+                            estadoCelda.style.backgroundColor = "#ffcccc"; // Fondo rojo claro solo para la celda
+
+                            // Deshabilitar el botón de cancelar en esa fila
+                            var cancelarBtn = fila.querySelector(".btn[id='cancelarPedidoBtn']");
+                            if (cancelarBtn) {
+                                cancelarBtn.disabled = true;
+                                cancelarBtn.style.backgroundColor = "#d3d3d3"; // Cambia el estilo del botón
+                            }
+                        }
+                    });
+                });
+            </script>
+
     <footer>
         <p>&copy; 2024 Programación de Aplicaciones</p>
     </footer>
