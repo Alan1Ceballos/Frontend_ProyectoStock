@@ -1,0 +1,25 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 24 oct. 2024, 9:35:33 p. m.
+    Author     : bande
+*/
+
+/* Asegura que el html y el body ocupen toda la altura */
+html, body {
+    height: 100%; /* Asegura que el body ocupe toda la altura */
+    margin: 0; /* Elimina márgenes por defecto */
+}
+
+body {
+    display: flex; /* Usa flexbox para el layout */
+    flex-direction: column; /* Coloca los hijos en una columna */
+    font-family: Arial, sans-serif; /* Tipografía general */
+    background-color: #f0f0f0; /* Color de fondo general */
+}
+
+.btn:hover {
+    background-color: #45a049; /* Color más oscuro al pasar el mouse */
+}

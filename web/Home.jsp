@@ -20,10 +20,10 @@
     <meta charset="UTF-8">
     <title>Página Principal</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="Styles/Home.css">
+    <link rel="stylesheet" type="text/css" href="Styles/home.css">
 </head>
 <body>
-    <header class="p-3 bg-dark text-white">
+    <header class="p-3 bg-dark text-white d-flex justify-content-between align-items-center">
         <div class="encabezado">
             <h1 class="mb-1">Bienvenido a la página principal</h1>
             <%
@@ -35,54 +35,60 @@
                 <% } %>
             </p>
         </div>
+        <form action="LogoutServlet" method="POST" class="mb-0">
+            <button type="submit" class="btn btn-danger">Cerrar Sesión</button>
+        </form>
     </header>
-    <div class="contenido">
+
+      <div class="contenido d-flex justify-content-center align-items-center vh-100"> <!-- Centrado verticalmente -->
         <div class="row justify-content-center mt-4">
-            <!-- Carta 1: Crear Pedido -->
-            <div class="col-md-3 mb-4">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title">Crear Pedido</h5>
-                        <a href="crearPedido.jsp" class="btn btn-primary">Ir</a>
+            <div class="col-md-15">
+                <div class="mb-4">
+                    <div class="card text-center">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">Crear Pedido</h5>
+                            <a href="crearPedido" class="btn btn-primary ms-3">Ir</a>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Carta 2: Historial de Pedidos -->
-            <div class="col-md-3 mb-4">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title">Historial de Pedidos</h5>
-                        <form action="historialpedidos" method="GET">
-                            <button type="submit" class="btn btn-primary">Ir</button>
-                        </form>
+
+                <div class="mb-4">
+                    <div class="card text-center">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">Historial de Pedidos</h5>
+                            <form action="historialpedidos" method="GET">
+                                <button type="submit" class="btn btn-primary ms-3">Ir</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Carta 3: Listado de Clientes -->
-            <div class="col-md-3 mb-4">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title">Listado de Clientes</h5>
-                        <form action="clientes" method="GET">
-                            <button type="submit" class="btn btn-primary">Ir</button>
-                        </form>
+                <div class="mb-4">
+                    <div class="card text-center">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">Listado de Clientes</h5>
+                            <form action="clientes" method="GET">
+                                <button type="submit" class="btn btn-primary ms-3">Ir</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Carta 4: Generar Informe -->
-            <div class="col-md-3 mb-4">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title">Generar Informe</h5>
-                        <a href="generarInforme.jsp" class="btn btn-primary">Ir</a>
+                <div class="mb-4">
+                    <div class="card text-center">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">Generar Informe</h5>
+                            <form action="generarInforme" method="GET">
+                                <button type="submit" class="btn btn-primary ms-3">Ir</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+            
     <footer class="text-center mt-4">
         <p>&copy; 2024 Programación de Aplicaciones</p>
     </footer>

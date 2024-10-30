@@ -8,10 +8,17 @@
 <%@page import="logica.servicios.ClienteServicios"%>
 <%@page import="java.util.ArrayList"%>
 <%@page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    //verifica si hay una sesión activa
+    if (session == null || session.getAttribute("usuario") == null) {
+        //redirige a Login.jsp si el usuario no está autenticado
+        response.sendRedirect("Login.jsp");
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <head>
     <meta charset="UTF-8">
     <title>Historial de Pedidos</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -80,7 +87,7 @@
                             <tr>
                                 <td><%= pedido.getIdentificador() %></td>
                                 <td><%= pedido.getFechaPedido() %></td>
-                                <td><%= estadoPedido %></td>
+                                <td class="estadoPedido" data-estado="<%= estadoPedido %>"><%= estadoPedido %></td>
                                 <td><%= pedido.getTotal() %></td>
                                 <td><%= nombreCliente != null ? nombreCliente : "Desconocido" %></td>
                                 <td>
@@ -88,11 +95,11 @@
                                         <input type="hidden" name="idPedido" value="<%= pedido.getIdentificador() %>">
                                         <button type="submit" class="btn btn-primary">Ver Detalles</button>
                                     </form>
-                                    <form action="${pageContext.request.contextPath}/modificarPedido" method="get" style="display:inline;">
+                                    <form action="${pageContext.request.contextPath}/Vistas/modificarPedido.jsp" method="post" style="display:inline;">
                                         <input type="hidden" name="idPedido" value="<%= pedido.getIdentificador() %>">
                                         <button type="submit" class="btn btn-warning">Modificar Pedido</button>
                                     </form>
-                                    <form action="${pageContext.request.contextPath}/cancelarPedido" method="post" style="display:inline;">
+                                    <form action="${pageContext.request.contextPath}/cancelarPedido" method="post" style="display:inline;" onsubmit="return confirmarCancelacion();">
                                         <input type="hidden" name="idPedido" value="<%= pedido.getIdentificador() %>">
                                         <button type="submit" class="btn btn-danger">Cancelar Pedido</button>
                                     </form>
@@ -111,6 +118,41 @@
             </tbody>
         </table>
     </div>
+
+    <script> 
+        function confirmarCancelacion() {                   
+            var idPedido = document.querySelector(".idPedido").value;
+            // Usar el ID en la alerta de confirmación
+            return confirm("¿Es\n\ás seguro de que deseas cancelar el pedido con ID: " + idPedido + "?");
+        }
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Obtener todas las filas de la tabla
+            var filas = document.querySelectorAll("#tablaPedidos tbody tr");
+            // Iterar sobre cada fila
+            filas.forEach(function(fila) {
+                // Obtener la celda de estado en la fila actual
+                var estadoCelda = fila.querySelector(".estadoPedido");
+                var estadoPedido = estadoCelda.getAttribute("data-estado");
+
+                // Si el estado es "Cancelado", deshabilitar el botón y cambiar el color de la celda de estado
+                if (estadoPedido === "Cancelado") {
+                    // Cambiar el color de la celda de estado a rojo claro
+                    estadoCelda.style.backgroundColor = "#ffcccc";
+
+                    // Deshabilitar el botón de cancelar en esa fila
+                    var cancelarBtn = fila.querySelector(".btn-danger");
+                    if (cancelarBtn) {
+                        cancelarBtn.disabled = true;
+                        cancelarBtn.style.backgroundColor = "#d3d3d3"; // Fondo gris para el botón
+                        cancelarBtn.style.cursor = "not-allowed"; // Cambia el cursor
+                    }
+                }
+            });
+        });
+    </script>
+
 
     <footer class="text-center mt-4">
         <p>&copy; 2024 Programación de Aplicaciones</p>
