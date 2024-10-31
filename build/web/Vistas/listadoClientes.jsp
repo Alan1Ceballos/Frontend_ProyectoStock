@@ -21,7 +21,7 @@
 <body>
     <header class="d-flex align-items-center justify-content-between p-3 bg-dark text-white">
         <div class="encabezado">
-            <h1>Listado de Pedidos</h1>
+            <h1>Listado de Clientes</h1>
         </div>
         <div class="busqueda-filtros d-flex align-items-center">
             <input type="text" id="busqueda" onkeyup="filtrarTabla()" class="form-control me-2" placeholder="Buscar...">
