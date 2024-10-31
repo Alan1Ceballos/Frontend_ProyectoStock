@@ -1,9 +1,9 @@
 <%@ page import="java.util.List" %>
 <%@ page import="logica.Clases.Cliente" %>
 <%
-    //verifica si hay una sesión activa
+    //verifica si hay una sesiÃ³n activa
     if (session == null || session.getAttribute("usuario") == null) {
-        //redirige a Login.jsp si el usuario no está autenticado
+        //redirige a Login.jsp si el usuario no estÃ¡ autenticado
         response.sendRedirect("Login.jsp");
         return;
     }
@@ -31,7 +31,7 @@
                 <option value="rut">RUT</option>
                 <option value="nombre">Nombre</option>
                 <option value="email">Email</option>
-                <option value="telefono">Teléfono</option>
+                <option value="telefono">TelÃ©fono</option>
                 <option value="fecha">Fecha de Registro</option>
             </select>
         </div>
@@ -48,7 +48,7 @@
                         <th>RUT</th>
                         <th>Nombre</th>
                         <th>Email</th>
-                        <th>Teléfono</th>
+                        <th>TelÃ©fono</th>
                         <th>Fecha de Registro</th>
                     </tr>
                 </thead>
@@ -78,7 +78,7 @@
     </div>
 
     <footer class="text-center mt-4">
-        <p>&copy; 2024 Programación de Aplicaciones</p>
+        <p>&copy; 2024 ProgramaciÃ³n de Aplicaciones</p>
     </footer>
 
     <!-- Incluimos el JavaScript de Bootstrap -->
