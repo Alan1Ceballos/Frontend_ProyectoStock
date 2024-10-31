@@ -36,7 +36,7 @@ public class CrearPedidoServlet extends HttpServlet {
             throws ServletException, IOException {
 
         // Crear una instancia para obtener los clientes y servicios
-        ArrayList<Cliente> listaDeClientes = controladorCliente.listarClientes();
+        ArrayList<Cliente> listaDeClientes = controladorCliente.getClientesActivos();
         ArrayList<Producto> listaDeProductos = controladorProducto.listarProductosActivos();
         
         // Obtener las categorías activas

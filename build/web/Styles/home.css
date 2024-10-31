@@ -3,36 +3,68 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to c
 Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
 */
 /* 
-    Created on : 10 oct 2024, 19:25:16
+    Created on : 23 oct 2024, 19:31:27
     Author     : AlanCeballos
 */
 
+/* Asegura que el html y el body ocupen toda la altura */
+html, body {
+    height: 100%; /* Asegura que el body ocupe toda la altura */
+    margin: 0; /* Elimina márgenes por defecto */
+}
+
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-    margin: 0;
-    padding: 20px;
+    display: flex; /* Usa flexbox para el layout */
+    flex-direction: column; /* Coloca los hijos en una columna */
+    font-family: Arial, sans-serif; /* Tipografía general */
+    background-color: #f0f0f0; /* Color de fondo general */
 }
 
+/* Estilos del encabezado */
+header {
+    background-color: #212529; /* Fondo negro para el encabezado */
+    color: white; /* Color de texto blanco */
+    padding: 20px 0; /* Espacio interno superior e inferior */
+    margin-bottom: 20px; /* Espacio inferior del encabezado */
+}
+
+.encabezado {
+    display: flex; /* Usar flexbox para alinear elementos en el encabezado */
+    flex-direction: column; /* Cambia a columna para que el título y el mensaje estén uno debajo del otro */
+    align-items: flex-start; /* Alinea los elementos al inicio (izquierda) */
+    margin: 0 20px; /* Margen lateral de 20px */
+}
+
+/* Estilo del título */
 h1 {
-    color: #333;
+    margin: 0; /* Eliminar márgenes para evitar desplazamientos no deseados */
+    font-size: 2em; /* Ajustar el tamaño de la fuente si es necesario */
 }
 
-#welcome-message {
-    font-size: 1.2em;
-    margin-top: 20px;
+
+/* Sección de contenido */
+.contenido {
+    flex: 1; /* Permite que el contenido crezca y ocupe espacio disponible */
+    margin: 0 20px; /* Margen lateral de 20px */
 }
 
-a {
-    display: inline-block;
-    margin-top: 20px;
-    padding: 10px 15px;
-    background-color: #4CAF50;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
+.carta {
+    background: white;
+    border-radius: 8px;
+    margin: 10px;
+    padding: 20px;
+    text-align: center;
+    width: 150px; /* Ajusta el ancho según sea necesario */
+    border: 2px solid black; /* Borde negro */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra */
 }
 
-a:hover {
-    background-color: #45a049;
+/* Estilos del pie de página */
+footer {
+    text-align: center; /* Centrar el texto del pie de página */
+    background-color: #212529; /* Fondo oscuro para el pie de página */
+    color: white; /* Color de texto blanco */
+    padding: 10px 0; /* Espacio interno del pie de página */
+    margin-top: 20px
 }
+

@@ -1,0 +1,105 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 23 oct 2024, 19:31:27
+    Author     : AlanCeballos
+*/
+
+/* Asegura que el html y el body ocupen toda la altura */
+html, body {
+    height: 100%; /* Asegura que el body ocupe toda la altura */
+    margin: 0; /* Elimina márgenes por defecto */
+}
+
+body {
+    display: flex; /* Usa flexbox para el layout */
+    flex-direction: column; /* Coloca los hijos en una columna */
+    font-family: Arial, sans-serif; /* Tipografía general */
+    background-color: #f0f0f0; /* Color de fondo general */
+}
+
+/* Estilos del encabezado */
+header {
+    background-color: #212529; /* Fondo negro para el encabezado */
+    color: white; /* Color de texto blanco */
+    padding: 20px 0; /* Espacio interno superior e inferior */
+    margin-bottom: 20px; /* Espacio inferior del encabezado */
+}
+
+.encabezado {
+    display: flex; /* Usar flexbox para alinear elementos en el encabezado */
+    align-items: center; /* Centrar verticalmente los elementos */
+    justify-content: space-between; /* Espaciado entre el título y la barra de búsqueda */
+    margin: 0 20px; /* Margen lateral de 20px */
+}
+
+.busqueda-filtros {
+    margin-left: 20px; /* Espacio entre el título y la barra de búsqueda */
+    padding: 10px; /* Espaciado interno */
+    font-size: 1em; /* Tamaño de fuente */
+    border: 1px solid #ccc; /* Borde gris claro */
+    border-radius: 4px; /* Bordes redondeados */
+    margin: 0 20px; /* Margen lateral de 20px */
+}
+
+/* Estilo del título */
+h1 {
+    margin: 0; /* Eliminar márgenes para evitar desplazamientos no deseados */
+    font-size: 2em; /* Ajustar el tamaño de la fuente si es necesario */
+}
+
+
+/* Sección de contenido */
+.contenido {
+    flex: 1; /* Permite que el contenido crezca y ocupe espacio disponible */
+    margin: 0 20px; /* Margen lateral de 20px */
+}
+
+
+/* Estilos del pie de página */
+footer {
+    text-align: center; /* Centrar el texto del pie de página */
+    background-color: #212529; /* Fondo oscuro para el pie de página */
+    color: white; /* Color de texto blanco */
+    padding: 10px 0; /* Espacio interno del pie de página */
+    margin-top: 20px
+}
+
+/* Estilos para la tabla */
+table {
+    width: 100%; /* Ancho completo de la página */
+    border-collapse: collapse; /* Colapsar bordes de la tabla */
+    margin-top: 20px; /* Espacio superior */
+}
+
+th, td {
+    border: 1px solid #ccc; /* Borde gris claro */
+    padding: 10px; /* Espaciado interno */
+    text-align: center; /* Alinear texto al centro */
+    vertical-align: middle; /* Centrar verticalmente el contenido */
+}
+
+th {
+    background-color: #4CAF50; /* Fondo verde para el encabezado */
+    color: white; /* Color de texto blanco */
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2; /* Fondo gris claro para filas pares */
+}
+
+tr:hover {
+    background-color: #ddd; /* Fondo gris más oscuro al pasar el mouse */
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 15px;
+    text-decoration: none;
+    border-radius: 5px;
+    border: none; /* Sin borde */
+    cursor: pointer; /* Cambiar cursor al pasar por encima */
+    font-weight: bold; /* Texto en negrita */
+}

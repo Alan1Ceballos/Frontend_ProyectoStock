@@ -26,7 +26,7 @@ import org.json.JSONObject;
  * @author Mateo
  */
 @WebServlet(urlPatterns = {"/verCarrito"})
-public class verCarrito extends HttpServlet {
+public class verCarritoServlet extends HttpServlet {
 
     IControladorPedido controladorPedido = Fabrica.getInstance().getIControladorPedido();
 

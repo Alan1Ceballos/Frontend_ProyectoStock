@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+
 import logica.Fabrica;
 import logica.Interfaces.IControladorVendedor;
 
@@ -31,16 +32,21 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
 
         try {
+            //validamos las credenciales del usuario
             if (validateUsuario(userName, password)) {
+                //obtenemos el ID del vendedor a través del controlador
+                IControladorVendedor controladorVendedor = Fabrica.getInstance().getIControladorVendedor();
+                Integer idVendedor = controladorVendedor.obtenerIdPorUsuario(userName);
+
+                //creamos la sesión y guardamos el usuario y el idVendedor
                 HttpSession session = request.getSession();
                 session.setAttribute("usuario", userName);
+                session.setAttribute("idVendedor", idVendedor);  //guardamos el ID del vendedor en la sesión
                 
-                // Obtiene el ID del vendedor y lo guarda en la sesión
-                Integer idVendedor = getVendedorId(userName);
-                session.setAttribute("idVendedor", idVendedor);
-                
+                //redirigimos al Home.jsp
                 response.sendRedirect("Home.jsp");
             } else {
+                //usuario o contraseña incorrectos
                 request.setAttribute("errorMessage", "Usuario o contraseña incorrectos.");
                 request.getRequestDispatcher("Login.jsp").forward(request, response);
             }
@@ -51,11 +57,7 @@ public class LoginServlet extends HttpServlet {
         }
     }
 
-    private Integer getVendedorId(String username) {
-        IControladorVendedor controladorVendedor = Fabrica.getInstance().getIControladorVendedor();
-        return controladorVendedor.obtenerIdPorUsuario(username);
-    }
-
+    //método para validar las credenciales del usuario
     private boolean validateUsuario(String username, String password) {
         //obtenemos instancia del controlador de vendedores
         IControladorVendedor controladorVendedor = Fabrica.getInstance().getIControladorVendedor();
