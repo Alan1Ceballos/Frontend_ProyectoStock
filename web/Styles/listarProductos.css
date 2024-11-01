@@ -1,0 +1,30 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 31 oct. 2024, 9:37:26 p. m.
+    Author     : bande
+*/
+
+/* Estilos para los filtros */
+.busqueda-filtros {
+    margin-left: 20px; /* Espacio entre el título y la barra de búsqueda */
+    padding: 10px; /* Espaciado interno */
+    font-size: 1em; /* Tamaño de fuente */
+    border: 1px solid #ccc; /* Borde gris claro */
+    border-radius: 4px; /* Bordes redondeados */
+    margin: 0 20px; /* Margen lateral de 20px */
+}
+
+input[type="text"] {
+    padding: 10px; /* Espaciado interno para el campo de búsqueda */
+    border: 1px solid #ccc; /* Borde gris claro */
+    border-radius: 4px; /* Bordes redondeados */
+}
+
+select {
+    padding: 10px; /* Espaciado interno para los selectores */
+    border: 1px solid #ccc; /* Borde gris claro */
+    border-radius: 4px; /* Bordes redondeados */
+}

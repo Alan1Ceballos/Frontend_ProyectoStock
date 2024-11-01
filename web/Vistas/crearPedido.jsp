@@ -43,7 +43,7 @@
                                     Cliente cliente = clientes.get(i);
                                     int clienteId = idsClientes.get(i);
                         %>
-                        <option value="<%= clienteId %>"><%= cliente.getNum_rut() %> - <%= cliente.getNom_empresa() %> - <%= cliente.getCorreo_electronico() %></option>
+                        <option value="<%= clienteId %>"><%= cliente.getIdentificador()%> - <%= cliente.getNom_empresa() %> - <%= cliente.getCorreo_electronico() %></option>
                         <%
                                 }
                             }

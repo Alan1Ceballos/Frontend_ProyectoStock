@@ -1,23 +1,49 @@
-<%-- 
-    Document   : verDetallesPedido
-    Created on : 23 oct 2024, 21:24:33
-    Author     : AlanCeballos
---%>
-
 <%@ page import="java.util.Base64" %>
 <%@ page import="java.util.List" %>
 <%@ page import="logica.Clases.Pedido" %>
 <%@ page import="logica.Clases.DetallePedido" %>
 <%@ page import="logica.Clases.Proveedor" %>
 <%@ page import="logica.Clases.Producto" %>
+<%@ page import="java.util.ArrayList" %>
 
 <%
-    //verifica si hay una sesión activa
+    // Verifica si hay una sesión activa
     if (session == null || session.getAttribute("usuario") == null) {
-        //redirige a Login.jsp si el usuario no está autenticado
+        // Redirige a Login.jsp si el usuario no está autenticado
         response.sendRedirect("Login.jsp");
         return;
     }
+
+    // Obtener el número de página desde los parámetros de la solicitud
+    String pageParam = request.getParameter("page");
+    int paginaActual = (pageParam != null) ? Integer.parseInt(pageParam) : 1;
+    int filasPorPagina = 10;
+
+    // Obtener la lista de detalles
+    List<DetallePedido> detalles = (List<DetallePedido>) request.getAttribute("detalles");
+    if (detalles == null) {
+        detalles = new ArrayList<>(); // Iniciar como lista vacía si es null
+    }
+
+    // Inicializa el total del pedido
+    double totalPedido = 0; // Inicializa la variable total
+
+    // Calcular el total de todos los detalles (sin paginación)
+    for (DetallePedido detalle : detalles) {
+        double cantidad = detalle.getCantidad();
+        double precioUnitario = detalle.getPrecioVenta();
+        double subtotal = cantidad * precioUnitario; // Calcular subtotal
+        totalPedido += subtotal; // Sumar al total del pedido
+    }
+
+    // Calcular el índice de inicio y fin para la paginación
+    int totalDetalles = detalles.size();
+    int totalPaginas = (int) Math.ceil((double) totalDetalles / filasPorPagina);
+    int inicio = (paginaActual - 1) * filasPorPagina;
+    int fin = Math.min(inicio + filasPorPagina, totalDetalles);
+
+    // Filtrar la lista de detalles para mostrar solo la página actual
+    List<DetallePedido> detallesPagina = detalles.subList(inicio, fin);
 %>
 
 <!DOCTYPE html>
@@ -42,7 +68,8 @@
                 <option value="nombre">Nombre</option>
                 <option value="descripcion">Descripción</option>
                 <option value="cantidad">Cantidad</option>
-                <option value="precioventa">Precio Venta</option>
+                <option value="precioventa">Precio Unitario</option>
+                <option value="subtotal">Subtotal</option>
                 <option value="proveedores">Proveedores</option>
             </select>
         </div>
@@ -53,17 +80,17 @@
             <thead class="table-dark">
                 <tr>
                     <th>Producto</th>
-                    <th>Nombre</th>
-                    <th>Descripción</th>
-                    <th>Cantidad</th>
-                    <th>Precio Venta</th>
-                    <th>Proveedores</th>
+                    <th onclick="ordenarTabla(1)">Nombre <span id="iconoOrden1"></span></th>
+                    <th onclick="ordenarTabla(2)">Descripción <span id="iconoOrden2"></span></th>
+                    <th onclick="ordenarTabla(3)">Cantidad <span id="iconoOrden3"></span></th>
+                    <th onclick="ordenarTabla(4)">Precio Unitario <span id="iconoOrden4"></span></th>
+                    <th onclick="ordenarTabla(5)">Subtotal <span id="iconoOrden5"></span></th>
+                    <th onclick="ordenarTabla(6)">Proveedores <span id="iconoOrden6"></span></th>
                 </tr>
             </thead>
             <tbody>
                 <%
-                    List<DetallePedido> detalles = (List<DetallePedido>) request.getAttribute("detalles");
-                    for (DetallePedido detalle : detalles) {
+                    for (DetallePedido detalle : detallesPagina) {
                         // Convertimos el byte[] de la imagen a base64
                         byte[] imagenProducto = detalle.getProducto().getImagen();
                         String imagenBase64 = "";
@@ -80,6 +107,11 @@
                         if (!proveedoresNombres.isEmpty()) {
                             proveedoresNombres = proveedoresNombres.substring(0, proveedoresNombres.length() - 2);
                         }
+
+                        // Calcular el subtotal
+                        double cantidad = detalle.getCantidad();
+                        double precioUnitario = detalle.getPrecioVenta();
+                        double subtotal = cantidad * precioUnitario; // Calcular subtotal
                 %>
                 <tr>
                     <td>
@@ -91,8 +123,9 @@
                     </td>
                     <td><%= detalle.getProducto().getNombre() %></td>
                     <td><%= detalle.getProducto().getDescripcion() %></td>
-                    <td><%= detalle.getCantidad() %></td>
-                    <td><%= detalle.getPrecioVenta() %></td>
+                    <td><%= cantidad %></td>
+                    <td><%= precioUnitario %></td>
+                    <td><%= subtotal %></td>
                     <td><%= proveedoresNombres %></td>
                 </tr>
                 <%
@@ -100,8 +133,49 @@
                 %>
             </tbody>
         </table>
+        
+    </div>
+    <!-- Paginación -->
+    <div class="d-flex justify-content-center align-items-center pagination">
+        <%
+            // Rango de páginas a mostrar
+            int rango = 1; // Número de páginas a mostrar a cada lado de la actual
+            int inicioPaginas = Math.max(1, paginaActual - rango); // Primera página a mostrar
+            int finPaginas = Math.min(totalPaginas, paginaActual + rango); // Última página a mostrar
+            int idPedido = request.getParameter("idPedido") != null ? Integer.parseInt(request.getParameter("idPedido")) : 0; // Obtener el idPedido
+
+            // Mostrar indicador de páginas previas
+            if (inicioPaginas > 1) {
+        %>
+            <a href="verdetalles?idPedido=<%= idPedido %>&page=1" class="btn btn-outline-secondary btn-sm mx-1">1</a>
+            <span class="mx-1">...</span>
+        <%
+            }
+
+            // Mostrar las páginas en el rango
+            for (int i = inicioPaginas; i <= finPaginas; i++) {
+                // Verifica si el botón es el de la página actual
+                String activeClass = (i == paginaActual) ? "btn-primary" : "btn-outline-secondary"; // Cambiar la clase del botón
+        %>
+                <a href="verdetalles?idPedido=<%= idPedido %>&page=<%= i %>" class="btn <%= activeClass %> btn-sm mx-1"><%= i %></a>
+        <%
+            }
+
+            // Mostrar indicador de páginas posteriores
+            if (finPaginas < totalPaginas) {
+        %>
+            <span class="mx-1">...</span>
+            <a href="verdetalles?idPedido=<%= idPedido %>&page=<%= totalPaginas %>" class="btn btn-outline-secondary btn-sm mx-1"><%= totalPaginas %></a>
+        <%
+            }
+        %>
     </div>
 
+    <!-- Cuadro que muestra el total del pedido -->
+    <div class="alert alert-info text-center mt-4">
+        <strong>Total del Pedido: </strong><span id="totalPedido"><%= totalPedido %></span>
+    </div>
+    
     <footer class="text-center mt-4">
         <p>&copy; 2024 Programación de Aplicaciones</p>
     </footer>
