@@ -5,16 +5,17 @@
 <%@ page import="logica.Clases.Proveedor" %>
 <%@ page import="logica.Clases.Producto" %>
 <%@ page import="java.util.ArrayList" %>
+<%@page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%
-    // Verifica si hay una sesiÛn activa
+    // Verifica si hay una sesi√≥n activa
     if (session == null || session.getAttribute("usuario") == null) {
-        // Redirige a Login.jsp si el usuario no est· autenticado
+        // Redirige a Login.jsp si el usuario no est√° autenticado
         response.sendRedirect("Login.jsp");
         return;
     }
 
-    // Obtener el n˙mero de p·gina desde los par·metros de la solicitud
+    // Obtener el n√∫mero de p√°gina desde los par√°metros de la solicitud
     String pageParam = request.getParameter("page");
     int paginaActual = (pageParam != null) ? Integer.parseInt(pageParam) : 1;
     int filasPorPagina = 10;
@@ -22,13 +23,13 @@
     // Obtener la lista de detalles
     List<DetallePedido> detalles = (List<DetallePedido>) request.getAttribute("detalles");
     if (detalles == null) {
-        detalles = new ArrayList<>(); // Iniciar como lista vacÌa si es null
+        detalles = new ArrayList<>(); // Iniciar como lista vac√≠a si es null
     }
 
     // Inicializa el total del pedido
     double totalPedido = 0; // Inicializa la variable total
 
-    // Calcular el total de todos los detalles (sin paginaciÛn)
+    // Calcular el total de todos los detalles (sin paginaci√≥n)
     for (DetallePedido detalle : detalles) {
         double cantidad = detalle.getCantidad();
         double precioUnitario = detalle.getPrecioVenta();
@@ -36,14 +37,16 @@
         totalPedido += subtotal; // Sumar al total del pedido
     }
 
-    // Calcular el Ìndice de inicio y fin para la paginaciÛn
+    // Calcular el √≠ndice de inicio y fin para la paginaci√≥n
     int totalDetalles = detalles.size();
     int totalPaginas = (int) Math.ceil((double) totalDetalles / filasPorPagina);
     int inicio = (paginaActual - 1) * filasPorPagina;
     int fin = Math.min(inicio + filasPorPagina, totalDetalles);
 
-    // Filtrar la lista de detalles para mostrar solo la p·gina actual
+    // Filtrar la lista de detalles para mostrar solo la p√°gina actual
     List<DetallePedido> detallesPagina = detalles.subList(inicio, fin);
+    
+    String usuario = (String) session.getAttribute("usuario");
 %>
 
 <!DOCTYPE html>
@@ -52,36 +55,59 @@
     <meta charset="UTF-8">
     <title>Detalles del Pedido</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="Styles/verDetallesPedido.css">
     <script src="Scripts/verDetallesPedido.js"></script>
 </head>
 <body>
-    <header class="d-flex align-items-center justify-content-between p-3 bg-dark text-white">
-        <div class="encabezado">
-            <h1>Detalles del Pedido</h1>
-        </div>
+    <header class="p-3 bg-dark text-white d-flex justify-content-between align-items-center">
+        <button id="openMenuBtn" onclick="openMenu()" class="btn btn-light">‚ò∞ Men√∫</button>
         <div class="busqueda-filtros d-flex">
             <input type="text" id="busqueda" onkeyup="filtrarTabla()" class="form-control me-2" placeholder="Buscar...">
             <label for="filtro" class="me-2 my-auto">Filtros:</label>
             <select id="filtro" onchange="filtrarTabla()" class="form-select my-auto">
                 <option value="todos">Ninguno</option>
                 <option value="nombre">Nombre</option>
-                <option value="descripcion">DescripciÛn</option>
+                <option value="descripcion">Descripci√≥n</option>
                 <option value="cantidad">Cantidad</option>
                 <option value="precioventa">Precio Unitario</option>
                 <option value="subtotal">Subtotal</option>
                 <option value="proveedores">Proveedores</option>
             </select>
         </div>
+        <div class="encabezado">
+            <h1 class="mb-1 text-decoration-underline">Detalles del Pedido</h1>
+            <p id="session-info" class="mb-0">
+                Sesi√≥n iniciada por: <strong><%= usuario %></strong>
+            </p>
+        </div>
     </header>
+            
+    <!-- Men√∫ lateral -->
+    <div id="sidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeMenu()">‚ò∞ Cerrar</a>
+        <a href="Home.jsp"><span class="material-icons">home</span> Inicio</a>
+        <a href="crearPedido"><span class="material-icons">shopping_cart</span> Crear Pedido</a>
+        <a href="historialpedidos"><span class="material-icons">history</span> Historial de Pedidos</a>
+        <a href="clientes"><span class="material-icons">people</span> Listado de Clientes</a>
+        <a href="listadoProductos"><span class="material-icons">inventory</span> Listado de Productos</a>
+        <a href="generarInforme"><span class="material-icons">insert_chart</span> Generar Informe</a>
+        
+        <hr>
+        
+        <a href="LogoutServlet"><span class="material-icons">logout</span> Cerrar Sesi√≥n</a>
+    </div>
 
+    <!-- Overlay de oscurecimiento -->
+    <div id="overlay" class="overlay" onclick="closeMenu()"></div>
+    
     <div class="contenido">
         <table id="tablaDetalles" class="table table-striped table-hover table-bordered mx-auto">
             <thead class="table-dark">
                 <tr>
                     <th>Producto</th>
                     <th onclick="ordenarTabla(1)">Nombre <span id="iconoOrden1"></span></th>
-                    <th onclick="ordenarTabla(2)">DescripciÛn <span id="iconoOrden2"></span></th>
+                    <th onclick="ordenarTabla(2)">Descripci√≥n <span id="iconoOrden2"></span></th>
                     <th onclick="ordenarTabla(3)">Cantidad <span id="iconoOrden3"></span></th>
                     <th onclick="ordenarTabla(4)">Precio Unitario <span id="iconoOrden4"></span></th>
                     <th onclick="ordenarTabla(5)">Subtotal <span id="iconoOrden5"></span></th>
@@ -103,7 +129,7 @@
                         for (Proveedor proveedor : proveedores) {
                             proveedoresNombres += proveedor.getNombre() + ", ";
                         }
-                        // Eliminar la ˙ltima coma y espacio
+                        // Eliminar la √∫ltima coma y espacio
                         if (!proveedoresNombres.isEmpty()) {
                             proveedoresNombres = proveedoresNombres.substring(0, proveedoresNombres.length() - 2);
                         }
@@ -135,16 +161,16 @@
         </table>
         
     </div>
-    <!-- PaginaciÛn -->
+    <!-- Paginaci√≥n -->
     <div class="d-flex justify-content-center align-items-center pagination">
         <%
-            // Rango de p·ginas a mostrar
-            int rango = 1; // N˙mero de p·ginas a mostrar a cada lado de la actual
-            int inicioPaginas = Math.max(1, paginaActual - rango); // Primera p·gina a mostrar
-            int finPaginas = Math.min(totalPaginas, paginaActual + rango); // ⁄ltima p·gina a mostrar
+            // Rango de p√°ginas a mostrar
+            int rango = 1; // N√∫mero de p√°ginas a mostrar a cada lado de la actual
+            int inicioPaginas = Math.max(1, paginaActual - rango); // Primera p√°gina a mostrar
+            int finPaginas = Math.min(totalPaginas, paginaActual + rango); // √öltima p√°gina a mostrar
             int idPedido = request.getParameter("idPedido") != null ? Integer.parseInt(request.getParameter("idPedido")) : 0; // Obtener el idPedido
 
-            // Mostrar indicador de p·ginas previas
+            // Mostrar indicador de p√°ginas previas
             if (inicioPaginas > 1) {
         %>
             <a href="verdetalles?idPedido=<%= idPedido %>&page=1" class="btn btn-outline-secondary btn-sm mx-1">1</a>
@@ -152,16 +178,16 @@
         <%
             }
 
-            // Mostrar las p·ginas en el rango
+            // Mostrar las p√°ginas en el rango
             for (int i = inicioPaginas; i <= finPaginas; i++) {
-                // Verifica si el botÛn es el de la p·gina actual
-                String activeClass = (i == paginaActual) ? "btn-primary" : "btn-outline-secondary"; // Cambiar la clase del botÛn
+                // Verifica si el bot√≥n es el de la p√°gina actual
+                String activeClass = (i == paginaActual) ? "btn-primary" : "btn-outline-secondary"; // Cambiar la clase del bot√≥n
         %>
                 <a href="verdetalles?idPedido=<%= idPedido %>&page=<%= i %>" class="btn <%= activeClass %> btn-sm mx-1"><%= i %></a>
         <%
             }
 
-            // Mostrar indicador de p·ginas posteriores
+            // Mostrar indicador de p√°ginas posteriores
             if (finPaginas < totalPaginas) {
         %>
             <span class="mx-1">...</span>
@@ -177,9 +203,19 @@
     </div>
     
     <footer class="text-center mt-4">
-        <p>&copy; 2024 ProgramaciÛn de Aplicaciones</p>
+        <p>&copy; 2024 Programaci√≥n de Aplicaciones</p>
     </footer>
 
+    <script>
+        function openMenu() {
+            document.getElementById("sidebar").style.width = "250px";
+            document.getElementById("overlay").style.display = "block";
+        }
+        function closeMenu() {
+            document.getElementById("sidebar").style.width = "0";
+            document.getElementById("overlay").style.display = "none";
+        }
+    </script>
     <!-- Incluye Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>

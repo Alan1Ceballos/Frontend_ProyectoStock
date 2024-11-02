@@ -20,6 +20,123 @@ body {
     background-color: #f0f0f0; /* Color de fondo general */
 }
 
+/* Estilos del encabezado */
+header {
+    background-color: #212529; /* Fondo negro para el encabezado */
+    color: white; /* Color de texto blanco */
+    padding: 20px 0; /* Espacio interno superior e inferior */
+    margin-bottom: 20px; /* Espacio inferior del encabezado */
+}
+
+/* Botón para abrir el menú */
+#openMenuBtn {
+    font-size: 20px;
+    color: white;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+/* Efecto hover para el botón del menú */
+#openMenuBtn:hover {
+    color: #f1f1f1;
+    transform: scale(1.1); /* Agranda ligeramente el botón */
+}
+
+/* Menú lateral */
+.sidebar {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 20px;
+    z-index: 1000;
+}
+
+.sidebar a {
+    padding: 10px 15px;
+    text-decoration: none;
+    font-size: 20px;
+    color: #818181;
+    display: flex;
+    align-items: center;
+    transition: color 0.3s ease, transform 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.sidebar a:hover {
+    color: #f1f1f1;
+    transform: translateX(5px); /* Desplaza ligeramente hacia la derecha */
+}
+
+/* Efecto hover para los íconos */
+.sidebar a .material-icons {
+    font-size: 24px;
+    margin-right: 10px;
+    color: #818181;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+/* Al pasar el mouse, el ícono se agranda levemente */
+.sidebar a:hover .material-icons {
+    transform: scale(1.1); /* Agranda el ícono ligeramente */
+    color: #f1f1f1; /* Cambia el color del ícono */
+}
+
+/* Botón cerrar */
+.sidebar .closebtn {
+    font-size: 20px;
+    padding-left: 15px;
+    margin-bottom: 20px;
+    color: #f1f1f1;
+}
+
+/* Overlay */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: none;
+}
+.sidebar hr {
+    border: 0.5px solid #818181;
+    margin: 15px auto;
+    width: 80%;
+        }
+        
+            .active {
+    background-color: #343a40; /* Color de fondo para el enlace activo */
+    color: white; /* Color de texto */
+    pointer-events: none; /* Desactiva los eventos de clic si es necesario */
+}
+
+.encabezado {
+    display: flex; /* Usar flexbox para alinear elementos en el encabezado */
+    flex-direction: column; /* Cambia a columna para que el título y el mensaje estén uno debajo del otro */
+    align-items: flex-start; /* Alinea los elementos al inicio (izquierda) */
+    margin: 0 20px; /* Margen lateral de 20px */
+}
+
+
+.busqueda-filtros {
+    width: 500px; /* Ancho específico */
+    margin: 0 20px 0 auto; /* Alinea a la derecha */
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid #000;
+    border-radius: 4px;
+}
+
 .btn:hover {
     background-color: #45a049; /* Color más oscuro al pasar el mouse */
 }

@@ -7,12 +7,13 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="javax.servlet.http.HttpSession" %>
 <%
-    //verifica si hay una sesión activa
+    // Verifica si hay una sesión activa
     if (session == null || session.getAttribute("usuario") == null) {
-        //redirige a Login.jsp si el usuario no está autenticado
+        // Redirige a Login.jsp si el usuario no está autenticado
         response.sendRedirect("Login.jsp");
         return;
     }
+    String usuario = (String) session.getAttribute("usuario");
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -20,88 +21,58 @@
     <meta charset="UTF-8">
     <title>Página Principal</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="Styles/home.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="Styles/Home.css">
 </head>
 <body>
-    <header class="p-3 bg-dark text-white d-flex justify-content-between align-items-center">
+     <header class="p-3 bg-dark text-white d-flex justify-content-between align-items-center">
+        <button id="openMenuBtn" onclick="openMenu()" class="btn btn-light">☰ Menú</button>
         <div class="encabezado">
-            <h1 class="mb-1">Bienvenido a la página principal</h1>
-            <%
-                String usuario = (String) session.getAttribute("usuario");
-            %>
-            <p id="welcome-message" class="mb-0">
-                <% if (usuario != null) { %>
-                    ¡Hola, <%= usuario %>! Has iniciado sesión correctamente.
-                <% } %>
+            <h1 class="mb-1 text-decoration-underline">Página Principal</h1>
+            <p id="session-info" class="mb-0">
+                Sesión iniciada por: <strong><%= usuario %></strong>
             </p>
         </div>
-        <form action="LogoutServlet" method="POST" class="mb-0">
-            <button type="submit" class="btn btn-danger">Cerrar Sesión</button>
-        </form>
     </header>
 
-      <div class="contenido d-flex justify-content-center align-items-center vh-100"> <!-- Centrado verticalmente -->
+    <!-- Menú lateral -->
+    <div id="sidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeMenu()">☰ Cerrar</a>
+        <a href="Home.jsp" class="active"><span class="material-icons">home</span> Inicio</a>
+        <a href="crearPedido"><span class="material-icons">shopping_cart</span> Crear Pedido</a>
+        <a href="historialpedidos"><span class="material-icons">history</span> Historial de Pedidos</a>
+        <a href="clientes"><span class="material-icons">people</span> Listado de Clientes</a>
+        <a href="listadoProductos"><span class="material-icons">inventory</span> Listado de Productos</a>
+        <a href="generarInforme"><span class="material-icons">insert_chart</span> Generar Informe</a>
+        
+        <hr>
+        
+        <a href="LogoutServlet"><span class="material-icons">logout</span> Cerrar Sesión</a>
+    </div>
+
+    <!-- Overlay de oscurecimiento -->
+    <div id="overlay" class="overlay" onclick="closeMenu()"></div>
+
+    <!-- Contenido principal -->
+    <div class="contenido d-flex justify-content-center align-items-center vh-100">
         <div class="row justify-content-center mt-4">
-            <div class="col-md-15">
-                <div class="mb-4">
-                    <div class="card text-center">
-                        <div class="card-body d-flex justify-content-between align-items-center">
-                            <h5 class="card-title mb-0">Crear Pedido</h5>
-                            <a href="crearPedido" class="btn btn-primary ms-3">Ir</a>
-                        </div>
-                    </div>
-                </div>
-
-
-                <div class="mb-4">
-                    <div class="card text-center">
-                        <div class="card-body d-flex justify-content-between align-items-center">
-                            <h5 class="card-title mb-0">Historial de Pedidos</h5>
-                            <form action="historialpedidos" method="GET">
-                                <button type="submit" class="btn btn-primary ms-3">Ir</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mb-4">
-                    <div class="card text-center">
-                        <div class="card-body d-flex justify-content-between align-items-center">
-                            <h5 class="card-title mb-0">Listado de Clientes</h5>
-                            <form action="clientes" method="GET">
-                                <button type="submit" class="btn btn-primary ms-3">Ir</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="mb-4">
-                    <div class="card text-center">
-                        <div class="card-body d-flex justify-content-between align-items-center">
-                            <h5 class="card-title mb-0">Listado de Productos</h5>
-                            <form action="listadoProductos" method="GET">
-                                <button type="submit" class="btn btn-primary ms-3">Ir</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mb-4">
-                    <div class="card text-center">
-                        <div class="card-body d-flex justify-content-between align-items-center">
-                            <h5 class="card-title mb-0">Generar Informe</h5>
-                            <form action="generarInforme" method="GET">
-                                <button type="submit" class="btn btn-primary ms-3">Ir</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <h2>Bienvenido a la Página Principal</h2>
+            <p>Utiliza el menú lateral para navegar por las diferentes secciones.</p>
         </div>
     </div>
-            
+
     <footer class="text-center mt-4">
         <p>&copy; 2024 Programación de Aplicaciones</p>
     </footer>
+    <script>
+        function openMenu() {
+            document.getElementById("sidebar").style.width = "250px";
+            document.getElementById("overlay").style.display = "block";
+        }
+        function closeMenu() {
+            document.getElementById("sidebar").style.width = "0";
+            document.getElementById("overlay").style.display = "none";
+        }
+    </script>
 </body>
 </html>

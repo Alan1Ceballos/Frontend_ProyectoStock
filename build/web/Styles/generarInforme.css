@@ -29,19 +29,102 @@ header {
     margin-bottom: 20px; /* Espacio inferior del encabezado */
 }
 
-.encabezado {
-    display: flex; /* Usar flexbox para alinear elementos en el encabezado */
-    align-items: center; /* Centrar verticalmente los elementos */
-    justify-content: space-between; /* Espaciado entre el título y la barra de búsqueda */
-    margin: 0 20px; /* Margen lateral de 20px */
+/* Botón para abrir el menú */
+#openMenuBtn {
+    font-size: 20px;
+    color: white;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.3s ease;
 }
 
-.busqueda-filtros {
-    margin-left: 20px; /* Espacio entre el título y la barra de búsqueda */
-    padding: 10px; /* Espaciado interno */
-    font-size: 1em; /* Tamaño de fuente */
-    border: 1px solid #ccc; /* Borde gris claro */
-    border-radius: 4px; /* Bordes redondeados */
+/* Efecto hover para el botón del menú */
+#openMenuBtn:hover {
+    color: #f1f1f1;
+    transform: scale(1.1); /* Agranda ligeramente el botón */
+}
+
+/* Menú lateral */
+.sidebar {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 20px;
+    z-index: 1000;
+}
+
+.sidebar a {
+    padding: 10px 15px;
+    text-decoration: none;
+    font-size: 20px;
+    color: #818181;
+    display: flex;
+    align-items: center;
+    transition: color 0.3s ease, transform 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.sidebar a:hover {
+    color: #f1f1f1;
+    transform: translateX(5px); /* Desplaza ligeramente hacia la derecha */
+}
+
+/* Efecto hover para los íconos */
+.sidebar a .material-icons {
+    font-size: 24px;
+    margin-right: 10px;
+    color: #818181;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+/* Al pasar el mouse, el ícono se agranda levemente */
+.sidebar a:hover .material-icons {
+    transform: scale(1.1); /* Agranda el ícono ligeramente */
+    color: #f1f1f1; /* Cambia el color del ícono */
+}
+
+/* Botón cerrar */
+.sidebar .closebtn {
+    font-size: 20px;
+    padding-left: 15px;
+    margin-bottom: 20px;
+    color: #f1f1f1;
+}
+
+/* Overlay */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: none;
+}
+.sidebar hr {
+    border: 0.5px solid #818181;
+    margin: 15px auto;
+    width: 80%;
+        }
+        
+            .active {
+    background-color: #343a40; /* Color de fondo para el enlace activo */
+    color: white; /* Color de texto */
+    pointer-events: none; /* Desactiva los eventos de clic si es necesario */
+}
+
+.encabezado {
+    display: flex; /* Usar flexbox para alinear elementos en el encabezado */
+    flex-direction: column; /* Cambia a columna para que el título y el mensaje estén uno debajo del otro */
+    align-items: flex-start; /* Alinea los elementos al inicio (izquierda) */
     margin: 0 20px; /* Margen lateral de 20px */
 }
 

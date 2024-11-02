@@ -2,36 +2,39 @@
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="java.util.List" %>
 <%@page import="logica.Clases.Cliente" %>
+<%@page contentType="text/html;charset=UTF-8" language="java" %>
 <%
-    // Verifica si hay una sesiÛn activa
+    // Verifica si hay una sesi√≥n activa
     if (session == null || session.getAttribute("usuario") == null) {
-        // Redirige a Login.jsp si el usuario no est· autenticado
+        // Redirige a Login.jsp si el usuario no est√° autenticado
         response.sendRedirect("Login.jsp");
         return;
     }
 
-    // Obtener el n˙mero de p·gina desde los par·metros de la solicitud
+    // Obtener el n√∫mero de p√°gina desde los par√°metros de la solicitud
     String pageParam = request.getParameter("page");
     int paginaActual = (pageParam != null) ? Integer.parseInt(pageParam) : 1;
     int filasPorPagina = 10;
 
-    // AquÌ deberÌas tener la lÛgica para obtener todos los clientes de la base de datos
+    // Aqu√≠ deber√≠as tener la l√≥gica para obtener todos los clientes de la base de datos
     List<Cliente> clientes = (List<Cliente>) request.getAttribute("clientes");
 
     // Verificar si clientes es null
     if (clientes == null) {
-        clientes = new ArrayList<>(); // Iniciar como lista vacÌa si es null
+        clientes = new ArrayList<>(); // Iniciar como lista vac√≠a si es null
     }
 
-    // Calcular el Ìndice de inicio y fin para la paginaciÛn
-    int totalClientes = (clientes != null) ? clientes.size() : 0; // Aseg˙rate de que clientes no sea null
+    // Calcular el √≠ndice de inicio y fin para la paginaci√≥n
+    int totalClientes = (clientes != null) ? clientes.size() : 0; // Aseg√∫rate de que clientes no sea null
     int totalPaginas = (int) Math.ceil((double) totalClientes / filasPorPagina);
     int inicio = (paginaActual - 1) * filasPorPagina;
     int fin = Math.min(inicio + filasPorPagina, totalClientes);
 
-    // Filtrar la lista de clientes para mostrar solo la p·gina actual
+    // Filtrar la lista de clientes para mostrar solo la p√°gina actual
     List<Cliente> clientesPagina = clientes.subList(inicio, fin);
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+    
+    String usuario = (String) session.getAttribute("usuario");
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -39,15 +42,14 @@
     <meta charset="UTF-8">
     <title>Listado de Clientes</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="Styles/listadoClientes.css">
     <script src="Scripts/listadoClientes.js"></script>
 </head>
 
 <body>
-    <header class="d-flex align-items-center justify-content-between p-3 bg-dark text-white">
-        <div class="encabezado">
-            <h1>Listado de Clientes</h1>
-        </div>
+    <header class="p-3 bg-dark text-white d-flex justify-content-between align-items-center">
+        <button id="openMenuBtn" onclick="openMenu()" class="btn btn-light">‚ò∞ Men√∫</button>
         <div class="busqueda-filtros d-flex align-items-center">
             <input type="text" id="busqueda" onkeyup="filtrarTabla()" class="form-control me-2" placeholder="Buscar...">
             <label for="filtro" class="me-2">Filtros:</label>
@@ -56,12 +58,36 @@
                 <option value="identificador">Identificador</option>
                 <option value="nombre">Nombre</option>
                 <option value="email">Email</option>
-                <option value="telefono">TelÈfono</option>
-                <option value="direccion">DirecciÛn</option>
+                <option value="telefono">Tel√©fono</option>
+                <option value="direccion">Direcci√≥n</option>
                 <option value="fecha">Fecha de Registro</option>
             </select>
         </div>
+        <div class="encabezado">
+            <h1 class="mb-1 text-decoration-underline">Listado de Clientes</h1>
+            <p id="session-info" class="mb-0">
+                Sesi√≥n iniciada por: <strong><%= usuario %></strong>
+            </p>
+        </div>
     </header>
+            
+    <!-- Men√∫ lateral -->
+    <div id="sidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeMenu()">‚ò∞ Cerrar</a>
+        <a href="Home.jsp"><span class="material-icons">home</span> Inicio</a>
+        <a href="crearPedido"><span class="material-icons">shopping_cart</span> Crear Pedido</a>
+        <a href="historialpedidos"><span class="material-icons">history</span> Historial de Pedidos</a>
+        <a href="clientes" class="active"><span class="material-icons">people</span> Listado de Clientes</a>
+        <a href="listadoProductos"><span class="material-icons">inventory</span> Listado de Productos</a>
+        <a href="generarInforme"><span class="material-icons">insert_chart</span> Generar Informe</a>
+        
+        <hr>
+        
+        <a href="LogoutServlet"><span class="material-icons">logout</span> Cerrar Sesi√≥n</a>
+    </div>
+
+    <!-- Overlay de oscurecimiento -->
+    <div id="overlay" class="overlay" onclick="closeMenu()"></div>
     
     <div class="contenido">
         <%
@@ -73,8 +99,8 @@
                         <th onclick="ordenarTabla(0)">Identificador <span id="iconoOrden0"></span></th>
                         <th onclick="ordenarTabla(1)">Nombre <span id="iconoOrden1"></span></th>
                         <th onclick="ordenarTabla(2)">Email <span id="iconoOrden2"></span></th>
-                        <th onclick="ordenarTabla(3)">TelÈfono <span id="iconoOrden3"></span></th>
-                        <th onclick="ordenarTabla(4)">DirecciÛn <span id="iconoOrden4"></span></th>
+                        <th onclick="ordenarTabla(3)">Tel√©fono <span id="iconoOrden3"></span></th>
+                        <th onclick="ordenarTabla(4)">Direcci√≥n <span id="iconoOrden4"></span></th>
                         <th onclick="ordenarTabla(5)">Fecha de Registro <span id="iconoOrden5"></span></th>
                     </tr>
                 </thead>
@@ -108,12 +134,12 @@
     </div>
     <div class="d-flex justify-content-center align-items-center pagination">
                 <%
-                    // Rango de p·ginas a mostrar
-                    int rango = 1; // N˙mero de p·ginas a mostrar a cada lado de la actual
-                    int inicioPaginas = Math.max(1, paginaActual - rango); // Primera p·gina a mostrar
-                    int finPaginas = Math.min(totalPaginas, paginaActual + rango); // ⁄ltima p·gina a mostrar
+                    // Rango de p√°ginas a mostrar
+                    int rango = 1; // N√∫mero de p√°ginas a mostrar a cada lado de la actual
+                    int inicioPaginas = Math.max(1, paginaActual - rango); // Primera p√°gina a mostrar
+                    int finPaginas = Math.min(totalPaginas, paginaActual + rango); // √öltima p√°gina a mostrar
 
-                    // Mostrar indicador de p·ginas previas
+                    // Mostrar indicador de p√°ginas previas
                     if (inicioPaginas > 1) {
                 %>
                     <a href="clientes?page=1" class="btn btn-outline-secondary btn-sm mx-1">1</a>
@@ -121,16 +147,16 @@
                 <%
                     }
 
-                    // Mostrar las p·ginas en el rango
+                    // Mostrar las p√°ginas en el rango
                     for (int i = inicioPaginas; i <= finPaginas; i++) {
-                        // Verifica si el botÛn es el de la p·gina actual
-                        String activeClass = (i == paginaActual) ? "btn-primary" : "btn-outline-secondary"; // Cambiar la clase del botÛn
+                        // Verifica si el bot√≥n es el de la p√°gina actual
+                        String activeClass = (i == paginaActual) ? "btn-primary" : "btn-outline-secondary"; // Cambiar la clase del bot√≥n
                 %>
                         <a href="clientes?page=<%= i %>" class="btn <%= activeClass %> btn-sm mx-1"><%= i %></a>
                 <%
                     }
 
-                    // Mostrar indicador de p·ginas posteriores
+                    // Mostrar indicador de p√°ginas posteriores
                     if (finPaginas < totalPaginas) {
                 %>
                     <span class="mx-1">...</span>
@@ -141,8 +167,19 @@
             </div>
 
     <footer class="text-center mt-4">
-        <p>&copy; 2024 ProgramaciÛn de Aplicaciones</p>
+        <p>&copy; 2024 Programaci√≥n de Aplicaciones</p>
     </footer>
+
+    <script>
+        function openMenu() {
+            document.getElementById("sidebar").style.width = "250px";
+            document.getElementById("overlay").style.display = "block";
+        }
+        function closeMenu() {
+            document.getElementById("sidebar").style.width = "0";
+            document.getElementById("overlay").style.display = "none";
+        }
+    </script>
 
     <!-- Incluimos el JavaScript de Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>

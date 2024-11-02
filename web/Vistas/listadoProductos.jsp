@@ -2,35 +2,38 @@
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="java.util.List" %>
 <%@page import="logica.Clases.Producto" %>
+<%@page contentType="text/html;charset=UTF-8" language="java" %>
 <%
-    // Verifica si hay una sesiÛn activa
+    // Verifica si hay una sesi√≥n activa
     if (session == null || session.getAttribute("usuario") == null) {
-        // Redirige a Login.jsp si el usuario no est· autenticado
+        // Redirige a Login.jsp si el usuario no est√° autenticado
         response.sendRedirect("Login.jsp");
         return;
     }
 
-    // Obtener el n˙mero de p·gina desde los par·metros de la solicitud
+    // Obtener el n√∫mero de p√°gina desde los par√°metros de la solicitud
     String pageParam = request.getParameter("page");
     int paginaActual = (pageParam != null) ? Integer.parseInt(pageParam) : 1;
     int filasPorPagina = 10;
 
-    // LÛgica para obtener todos los productos de la base de datos
+    // L√≥gica para obtener todos los productos de la base de datos
     List<Producto> productos = (List<Producto>) request.getAttribute("productos");
 
     // Verificar si productos es null
     if (productos == null) {
-        productos = new ArrayList<>(); // Iniciar como lista vacÌa si es null
+        productos = new ArrayList<>(); // Iniciar como lista vac√≠a si es null
     }
 
-    // Calcular el Ìndice de inicio y fin para la paginaciÛn
+    // Calcular el √≠ndice de inicio y fin para la paginaci√≥n
     int totalProductos = productos.size();
     int totalPaginas = (int) Math.ceil((double) totalProductos / filasPorPagina);
     int inicio = (paginaActual - 1) * filasPorPagina;
     int fin = Math.min(inicio + filasPorPagina, totalProductos);
 
-    // Filtrar la lista de productos para mostrar solo la p·gina actual
+    // Filtrar la lista de productos para mostrar solo la p√°gina actual
     List<Producto> productosPagina = productos.subList(inicio, fin);
+    
+    String usuario = (String) session.getAttribute("usuario");
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -38,28 +41,51 @@
     <meta charset="UTF-8">
     <title>Listado de Productos</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="Styles/listadoClientes.css">
     <script src="Scripts/listadoProductos.js"></script>
 </head>
 
 <body>
-    <header class="d-flex align-items-center justify-content-between p-3 bg-dark text-white">
-        <div class="encabezado">
-            <h1>Listado de Productos</h1>
-        </div>
+    <header class="p-3 bg-dark text-white d-flex justify-content-between align-items-center">
+        <button id="openMenuBtn" onclick="openMenu()" class="btn btn-light">‚ò∞ Men√∫</button>
         <div class="busqueda-filtros d-flex align-items-center">
             <input type="text" id="busqueda" onkeyup="filtrarTabla()" class="form-control me-2" placeholder="Buscar...">
             <label for="filtro" class="me-2">Filtros:</label>
             <select id="filtro" onchange="filtrarTabla()" class="form-select">
                 <option value="ninguno">Ninguno</option>
                 <option value="nombre">Nombre</option>
-                <option value="descripcion">DescripciÛn</option>
+                <option value="descripcion">Descripci√≥n</option>
                 <option value="SKU">SKU</option>
                 <option value="precio">Precio de Venta</option>
                 <option value="stock">Stock</option>
             </select>
         </div>
+        <div class="encabezado">
+            <h1 class="mb-1 text-decoration-underline">Listado de Productos</h1>
+            <p id="session-info" class="mb-0">
+                Sesi√≥n iniciada por: <strong><%= usuario %></strong>
+            </p>
+        </div>
     </header>
+            
+    <!-- Men√∫ lateral -->
+    <div id="sidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeMenu()">‚ò∞ Cerrar</a>
+        <a href="Home.jsp"><span class="material-icons">home</span> Inicio</a>
+        <a href="crearPedido"><span class="material-icons">shopping_cart</span> Crear Pedido</a>
+        <a href="historialpedidos"><span class="material-icons">history</span> Historial de Pedidos</a>
+        <a href="clientes"><span class="material-icons">people</span> Listado de Clientes</a>
+        <a href="listadoProductos" class="active"><span class="material-icons">inventory</span> Listado de Productos</a>
+        <a href="generarInforme"><span class="material-icons">insert_chart</span> Generar Informe</a>
+        
+        <hr>
+        
+        <a href="LogoutServlet"><span class="material-icons">logout</span> Cerrar Sesi√≥n</a>
+    </div>
+
+    <!-- Overlay de oscurecimiento -->
+    <div id="overlay" class="overlay" onclick="closeMenu()"></div>
 
     <div class="contenido">
         <%
@@ -69,7 +95,7 @@
                 <thead class="table-dark">
                     <tr>
                         <th onclick="ordenarTabla(0)">Nombre <span id="iconoOrden0"></span></th>
-                        <th onclick="ordenarTabla(1)">DescripciÛn <span id="iconoOrden1"></span></th>
+                        <th onclick="ordenarTabla(1)">Descripci√≥n <span id="iconoOrden1"></span></th>
                         <th onclick="ordenarTabla(2)">SKU <span id="iconoOrden2"></span></th>
                         <th onclick="ordenarTabla(3)">Precio de Venta <span id="iconoOrden3"></span></th>
                         <th onclick="ordenarTabla(4)">Stock <span id="iconoOrden4"></span></th>
@@ -129,8 +155,19 @@
             </div>
 
     <footer class="text-center mt-4">
-        <p>&copy; 2024 ProgramaciÛn de Aplicaciones</p>
+        <p>&copy; 2024 Programaci√≥n de Aplicaciones</p>
     </footer>
+
+    <script>
+        function openMenu() {
+            document.getElementById("sidebar").style.width = "250px";
+            document.getElementById("overlay").style.display = "block";
+        }
+        function closeMenu() {
+            document.getElementById("sidebar").style.width = "0";
+            document.getElementById("overlay").style.display = "none";
+        }
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
