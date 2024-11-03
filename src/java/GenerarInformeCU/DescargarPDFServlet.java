@@ -112,6 +112,17 @@ public class DescargarPDFServlet extends HttpServlet {
         // Crear el formateador de fecha
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
 
+        // Calcular subtotales y ordenar pedidos de mayor a menor subtotal
+        // Calcular subtotales y ordenar pedidos de mayor a menor subtotal
+        List<Pedido> pedidosConSubtotal = pedidos.stream()
+                .map(pedido -> {
+                    float subtotalPedido = calcularSubtotalPedido(pedido);
+                    pedido.setTotal(subtotalPedido); // Asegúrate de que Pedido tenga un método setTotal
+                    return pedido;
+                })
+                .sorted((p1, p2) -> Float.compare(p2.getTotal(), p1.getTotal())) // Ordenar de mayor a menor
+                .collect(Collectors.toList());
+
         // Tabla de pedidos
         PdfPTable tablePedidos = new PdfPTable(5);
         tablePedidos.addCell("ID");
@@ -121,23 +132,12 @@ public class DescargarPDFServlet extends HttpServlet {
         tablePedidos.addCell("Cliente");
 
         // Agregar datos de pedidos a la tabla
-        for (Pedido pedido : pedidos) {
-            double subtotalPedido = 0;
-
-            // Calcular el subtotal del pedido sumando los subtotales de los detalles
-            List<DetallePedido> detallesPedido = detallePedidosServicios.obtenerDetallesPedido(pedido.getIdentificador());
-            for (DetallePedido detalle : detallesPedido) {
-                subtotalPedido += detalle.getPrecioVenta() * detalle.getCantidad();
-            }
-
+        for (Pedido pedido : pedidosConSubtotal) {
             tablePedidos.addCell(String.valueOf(pedido.getIdentificador()));
-
-            // Formatear la fecha al formato español
             String fechaFormateada = dateFormat.format(pedido.getFechaPedido());
             tablePedidos.addCell(fechaFormateada);
-
             tablePedidos.addCell(traducirEstado(pedido.getEstado().toString()));
-            tablePedidos.addCell("$" + String.format("%.2f", subtotalPedido)); // Formatear subtotal con símbolo de dólar
+            tablePedidos.addCell("$" + String.format("%.2f", pedido.getTotal())); // Formatear subtotal
             tablePedidos.addCell(clienteServicios.getNombreClientePorId(pedido.getIdCliente()));
         }
 
@@ -147,6 +147,11 @@ public class DescargarPDFServlet extends HttpServlet {
         document.add(new Paragraph("Productos Vendidos"));
         document.add(new Paragraph(" "));
 
+        // Ordenar detalles de pedidos de mayor a menor precio de venta
+        List<DetallePedido> detallesOrdenados = detalles.stream()
+                .sorted((d1, d2) -> Double.compare(d2.getPrecioVenta(), d1.getPrecioVenta())) // Ordenar de mayor a menor
+                .collect(Collectors.toList());
+
         // Tabla de detalles de pedidos
         PdfPTable tableDetalles = new PdfPTable(5);
         tableDetalles.addCell("Producto");
@@ -155,32 +160,35 @@ public class DescargarPDFServlet extends HttpServlet {
         tableDetalles.addCell("Cantidad");
         tableDetalles.addCell("Precio Venta");
 
-        // Calcular ingresos generados
         double ingresosGenerados = 0;
 
         // Agregar datos de detalles a la tabla y calcular ingresos generados
-        for (DetallePedido detalle : detalles) {
+        for (DetallePedido detalle : detallesOrdenados) {
             tableDetalles.addCell(String.valueOf(detalle.getProducto().getId()));
             tableDetalles.addCell(detalle.getProducto().getNombre());
             tableDetalles.addCell(detalle.getProducto().getDescripcion());
             tableDetalles.addCell(String.valueOf(detalle.getCantidad()));
             tableDetalles.addCell("$" + String.format("%.2f", detalle.getPrecioVenta())); // Formatear precio venta
 
-            // Calcular subtotal y acumular en ingresosGenerados
             double subtotal = detalle.getPrecioVenta() * detalle.getCantidad();
             ingresosGenerados += subtotal;
-            System.out.println("Subtotal para " + detalle.getProducto().getNombre() + ": " + subtotal);
         }
 
         document.add(tableDetalles);
         document.add(new Paragraph(" "));
 
-        // Imprimir el total en consola
-        System.out.println("Total Ingresos Generados: $" + ingresosGenerados);
-
-        // Agregar total al PDF
         document.add(new Paragraph("Ingresos Generados: $" + String.format("%.2f", ingresosGenerados))); // Formatear total
         document.close();
+    }
+
+// Método para calcular el subtotal del pedido
+    private float calcularSubtotalPedido(Pedido pedido) {
+        float subtotal = 0;
+        List<DetallePedido> detallesPedido = detallePedidosServicios.obtenerDetallesPedido(pedido.getIdentificador());
+        for (DetallePedido detalle : detallesPedido) {
+            subtotal += detalle.getPrecioVenta() * detalle.getCantidad();
+        }
+        return subtotal;
     }
 
     // Método para traducir el estado del pedido
