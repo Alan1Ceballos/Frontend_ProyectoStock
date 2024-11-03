@@ -5,9 +5,9 @@
 --%>
 
 <%
-    //verifica si hay una sesión activa
+    // Verifica si hay una sesión activa
     if (session != null && session.getAttribute("usuario") != null) {
-        //redirige a Home.jsp si el usuario ya está autenticado
+        // Redirige a Home.jsp si el usuario ya está autenticado
         response.sendRedirect("Home.jsp");
         return;
     }
@@ -18,12 +18,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Inicio de Sesión</title>
-    <link rel="stylesheet" href="Styles/login.css">
+    <link rel="stylesheet" href="Styles/Login.css">
 </head>
 <body>
     <div class="contenedor-login">
         <h1>Inicio de Sesión</h1>
-        <form action="login" method="POST"> 
+        <form id="loginForm" action="login" method="POST"> 
             <label for="usuario">Usuario:</label>
             <input type="text" id="usuario" name="usuario" required>
 

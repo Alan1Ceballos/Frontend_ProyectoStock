@@ -112,9 +112,9 @@ header {
     border: 0.5px solid #818181;
     margin: 15px auto;
     width: 80%;
-        }
+}
 
-        .active {
+.active {
     background-color: #343a40; /* Color de fondo para el enlace activo */
     color: white; /* Color de texto */
     pointer-events: none; /* Desactiva los eventos de clic si es necesario */
@@ -140,15 +140,81 @@ h1 {
     margin: 0 20px; /* Margen lateral de 20px */
 }
 
-.carta {
-    background: white;
-    border-radius: 8px;
-    margin: 10px;
-    padding: 20px;
-    text-align: center;
-    width: 150px; /* Ajusta el ancho según sea necesario */
-    border: 2px solid black; /* Borde negro */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra */
+.card {
+    min-height: 250px; /* Altura mínima de las cartas */
+    background: #f8f9fa; /* Color de fondo de las cartas */
+    border: 1px solid #ced4da; /* Borde de las cartas */
+    transition: transform 0.2s; /* Efecto de hover */
+    display: flex; /* Utiliza flexbox para la carta */
+    flex-direction: column; /* Organiza el contenido en columna */
+    justify-content: center; /* Centra verticalmente */
+    align-items: center; /* Centra horizontalmente */
+    position: relative; /* Para el posicionamiento del icono */
+    overflow: hidden; /* Evita que el icono sobresalga de la carta */
+}
+
+.card-body {
+    text-align: center; /* Centra el texto */
+    display: flex; /* Utiliza flexbox para centrar el contenido */
+    flex-direction: column; /* Organiza el contenido en columna */
+    justify-content: center; /* Centra verticalmente el contenido de la carta */
+    align-items: center; /* Centra horizontalmente el contenido de la carta */
+    height: 100%; /* Asegura que el cuerpo de la carta ocupe toda la altura */
+    position: relative; /* Para el icono de fondo */
+    z-index: 1; /* Asegura que el texto esté por encima del icono */
+}
+
+.card-body h5 {
+    color: #343a40; /* Cambia el color del texto */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); /* Aplica una sombra al texto */
+    font-size: 1.5rem; /* Tamaño de la fuente del título */
+}
+
+.card-body p {
+    color: #6c757d; /* Color del texto del párrafo */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); /* Sombra para el párrafo */
+    font-size: 1rem; /* Tamaño de la fuente del párrafo */
+}
+
+
+.card::before {
+    content: ''; /* Crea un pseudo-elemento */
+    position: absolute; /* Posiciona el icono */
+    top: 50%; /* Centra verticalmente */
+    left: 50%; /* Centra horizontalmente */
+    width: 300px; /* Aumenta el ancho del icono */
+    height: 300px; /* Aumenta el alto del icono */
+    background: rgba(0, 0, 0, 0.05); /* Fondo del icono con opacidad */
+    border-radius: 50%; /* Forma circular */
+    transform: translate(-50%, -50%); /* Centra el icono */
+    z-index: 0; /* Asegura que esté detrás del texto */
+    opacity: 0.2; /* Hace que el icono sea más transparente */
+}
+
+
+/* Iconos de cada tarjeta */
+.card[data-icon="pedido"]::before {
+    background: url('https://fonts.gstatic.com/s/i/materialicons/shopping_cart/v6/24px.svg') no-repeat center / 60%; /* Icono de carrito de compras */
+}
+
+.card[data-icon="historial"]::before {
+    background: url('https://fonts.gstatic.com/s/i/materialicons/history/v6/24px.svg') no-repeat center / 60%; /* Icono de historial */
+}
+
+.card[data-icon="clientes"]::before {
+    background: url('https://fonts.gstatic.com/s/i/materialicons/people/v6/24px.svg') no-repeat center / 60%; /* Icono de personas */
+}
+
+.card[data-icon="productos"]::before {
+    background: url('https://fonts.gstatic.com/s/i/materialicons/inventory/v6/24px.svg') no-repeat center / 60%; /* Icono de inventario */
+}
+
+.card[data-icon="informe"]::before {
+    background: url('https://fonts.gstatic.com/s/i/materialicons/insert_chart/v6/24px.svg') no-repeat center / 60%; /* Icono de informe */
+}
+
+.row {
+    justify-content: center; /* Centra las cartas en la fila */
 }
 
 /* Estilos del pie de página */
@@ -159,4 +225,5 @@ footer {
     padding: 10px 0; /* Espacio interno del pie de página */
     margin-top: 20px
 }
+
 
