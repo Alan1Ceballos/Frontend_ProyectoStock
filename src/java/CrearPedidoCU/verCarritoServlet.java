@@ -5,7 +5,6 @@ package CrearPedidoCU;
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 
-import com.google.gson.JsonObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -108,7 +107,7 @@ public class verCarritoServlet extends HttpServlet {
                 nuevoPedido.agregarDetalle(detalle);
             }
 
-            boolean resultado = controladorPedido.agregarPedido(nuevoPedido);
+            boolean resultado = this.controladorPedido.agregarPedido(nuevoPedido);
             if (resultado) {
                 response.getWriter().write("Pedido añadido exitosamente.");
                 session.removeAttribute("carrito");

@@ -1,13 +1,14 @@
+<%@page import="logica.Interfaces.IControladorProducto"%>
+<%@page import="logica.Interfaces.IControladorCategoria"%>
+<%@page import="logica.Interfaces.IControladorPedido"%>
+<%@page import="logica.Interfaces.IControladorDetallePedido"%>
+<%@page import="logica.Fabrica"%>
 <%@page import="logica.Clases.Pedido.Estado"%>
 <%@page import="java.util.List"%>
 <%@page import="logica.Clases.Categoria"%>
 <%@page import="logica.Clases.Pedido"%>
 <%@page import="logica.Clases.DetallePedido"%>
-<%@page import="logica.servicios.DetallePedidoServicios"%>
-<%@page import="logica.servicios.PedidosServicios"%>
-<%@page import="logica.servicios.CategoriaServicios"%>
 <%@page import="logica.Clases.Producto"%>
-<%@page import="logica.servicios.ProductoServicios"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%
     //verifica si hay una sesión activa
@@ -20,17 +21,19 @@
 %>
 
 <%
+    IControladorDetallePedido ICDP = Fabrica.getInstance().getIControladorDetallePedido();
+    IControladorPedido ICP = Fabrica.getInstance().getIControladorPedido();
+    IControladorCategoria ICC = Fabrica.getInstance().getIControladorCategoria();
+    IControladorProducto ICPr = Fabrica.getInstance().getIControladorProducto();
+    
     int idPedido = Integer.parseInt(request.getParameter("idPedido"));
     double total = 0.0;
 
-    PedidosServicios pedidoServicios = new PedidosServicios();
-    Pedido pedido = pedidoServicios.obtenerPedidoPorId(idPedido);
+    Pedido pedido = ICP.obtenerPedidoPorId(idPedido);
 
-    CategoriaServicios categoriaServicios = new CategoriaServicios();
-    List<Categoria> categorias = categoriaServicios.listarCategorias();
+    List<Categoria> categorias = ICC.listarCategorias();
 
-    ProductoServicios productoServicios = new ProductoServicios();
-    List<Producto> productos = productoServicios.listarProductos();
+    List<Producto> productos = ICPr.listarProductos();
 
     Object[] pedidoInfo = {pedido.getFechaPedido(), pedido.getEstado(), pedido.getTotal(), pedido.getIdVendedor(), pedido.getIdCliente()};
 %>
@@ -149,8 +152,7 @@
                     </thead>
                     <tbody>
                         <% 
-                            DetallePedidoServicios detallePedidosServicios = new DetallePedidoServicios();
-                            List<DetallePedido> detalles = detallePedidosServicios.obtenerDetallesPedido(idPedido);
+                            List<DetallePedido> detalles = ICDP.obtenerDetallesPedido(idPedido);
                             for (DetallePedido detalle : detalles) {
                                 int idProducto = detalle.getProducto().getId();
                                 String nombreProducto = detalle.getProducto().getNombre();

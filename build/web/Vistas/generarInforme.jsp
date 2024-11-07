@@ -4,9 +4,10 @@
     Author     : AlanCeballos
 --%>
 
+<%@page import="logica.Interfaces.IControladorCategoria"%>
+<%@page import="logica.Interfaces.IControladorCliente"%>
+<%@page import="logica.Fabrica"%>
 <%@page import="java.util.List"%>
-<%@page import="logica.servicios.ClienteServicios"%>
-<%@page import="logica.servicios.CategoriaServicios"%>
 <%@page import="logica.Clases.Cliente"%>
 <%@page import="logica.Clases.Categoria"%>
 <%@page contentType="text/html;charset=UTF-8" language="java" %>
@@ -19,6 +20,8 @@
         return;
     }
     String usuario = (String) session.getAttribute("usuario");
+    IControladorCliente ICC = Fabrica.getInstance().getIControladorCliente();
+    IControladorCategoria ICCat = Fabrica.getInstance().getIControladorCategoria();
 %>
 
 <!DOCTYPE html>
@@ -95,8 +98,7 @@
                     <select name="nombreCliente" id="cliente" class="form-select">
                         <option value="">Seleccione un cliente</option>
                         <%
-                            ClienteServicios clienteServicios = new ClienteServicios();
-                            List<String> clientes = clienteServicios.obtenerNombresClientesActivos();
+                            List<String> clientes = ICC.obtenerNombresClientesActivos();
                             for (String cliente : clientes) {
                         %>
                             <option value="<%= cliente %>"><%= cliente %></option>
@@ -114,8 +116,7 @@
                     <select name="nombreCategoria" id="categoria" class="form-select">
                         <option value="">Seleccione una categoría</option>
                         <%
-                            CategoriaServicios categoriaServicios = new CategoriaServicios();
-                            List<Categoria> categorias = categoriaServicios.listarCategoriasActivas();
+                            List<Categoria> categorias = ICCat.listarCategoriasActivas();
                             for (Categoria categoria : categorias) {
                         %>
                             <option value="<%= categoria.getNombre() %>"><%= categoria.getNombre() %></option>

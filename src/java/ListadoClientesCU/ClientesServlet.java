@@ -14,14 +14,15 @@ import logica.Clases.Cliente;
 
 @WebServlet(urlPatterns = {"/clientes"})
 public class ClientesServlet extends HttpServlet {
+    
+    private IControladorCliente ICC = Fabrica.getInstance().getIControladorCliente();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
             // Obtenemos la instancia del controlador de clientes
-            IControladorCliente controladorCliente = Fabrica.getInstance().getIControladorCliente();
-            List<Cliente> clientes = controladorCliente.listarClientes();
+            List<Cliente> clientes = this.ICC.listarClientes();
 
             // Guardamos el listado de clientes en el request
             request.setAttribute("clientes", clientes);

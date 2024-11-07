@@ -1,5 +1,6 @@
+<%@page import="logica.Fabrica"%>
+<%@page import="logica.Interfaces.IControladorCliente"%>
 <%@page import="logica.Clases.Pedido"%>
-<%@page import="logica.servicios.ClienteServicios"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
 <%@page import="java.text.SimpleDateFormat"%>
@@ -34,6 +35,8 @@
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
     String usuario = (String) session.getAttribute("usuario");
+    
+    IControladorCliente ICC = Fabrica.getInstance().getIControladorCliente();
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -100,7 +103,6 @@
                 <tbody>
                     <%
                         if (pedidosPagina != null && !pedidosPagina.isEmpty()) {
-                            ClienteServicios clienteServicios = new ClienteServicios();
                             for (Pedido pedido : pedidosPagina) {
                                 String estadoPedido;
                                 switch (pedido.getEstado()) {
@@ -122,7 +124,7 @@
                                 }
 
                                 // Obtener el nombre del cliente usando el ID
-                                String nombreCliente = clienteServicios.getNombreClientePorId(pedido.getIdCliente());
+                                String nombreCliente = ICC.getNombreClientePorId(pedido.getIdCliente());
                     %>
                     <tr>
                         <td><%= dateFormat.format(pedido.getFechaPedido())%></td>

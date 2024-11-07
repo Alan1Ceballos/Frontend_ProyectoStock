@@ -7,7 +7,6 @@ package HistorialPedidosCU;
 
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.ServletException;
@@ -19,10 +18,11 @@ import javax.servlet.http.HttpServletResponse;
 import logica.Clases.DetallePedido;
 import logica.Clases.Pedido;
 import logica.Clases.Proveedor;
-import logica.servicios.DetallePedidoServicios;
-import logica.servicios.PedidosServicios;
-import logica.servicios.ProductoServicios;
-import logica.servicios.ProveedorServicios;
+import logica.Fabrica;
+import logica.Interfaces.IControladorDetallePedido;
+import logica.Interfaces.IControladorPedido;
+import logica.Interfaces.IControladorProducto;
+import logica.Interfaces.IControladorProveedor;
 
 /**
  *
@@ -31,30 +31,30 @@ import logica.servicios.ProveedorServicios;
 @WebServlet(name = "VerDetallesPedidoServlet", urlPatterns = {"/verdetalles"})
 public class VerDetallesPedidoServlet extends HttpServlet {
     
+    private IControladorPedido ICPe = Fabrica.getInstance().getIControladorPedido();
+    private IControladorDetallePedido ICDP = Fabrica.getInstance().getIControladorDetallePedido();
+    private IControladorProducto ICP = Fabrica.getInstance().getIControladorProducto();
+    private IControladorProveedor ICPro = Fabrica.getInstance().getIControladorProveedor();
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             //obtenemos el ID del pedido desde la solicitud
             int idPedido = Integer.parseInt(request.getParameter("idPedido"));
-            PedidosServicios pedidosServicios = new PedidosServicios();
-            DetallePedidoServicios detallePedidosServicios = new DetallePedidoServicios();
 
             //obtenemos el pedido y sus detalles
-            Pedido pedido = pedidosServicios.obtenerPedidoPorId(idPedido);
-            List<DetallePedido> detalles = detallePedidosServicios.obtenerDetallesPedido(idPedido);
+            Pedido pedido = this.ICPe.obtenerPedidoPorId(idPedido);
+            List<DetallePedido> detalles = this.ICDP.obtenerDetallesPedido(idPedido);
 
             //obtenemos proveedores para cada detalle
-            ProductoServicios productoServicios = new ProductoServicios();
-            ProveedorServicios proveedorServicios = new ProveedorServicios();
-
             for (DetallePedido detalle : detalles) {
                 //obtenemos proveedores por el ID del producto
-                List<Integer> proveedorIDs = productoServicios.obtenerProveedoresPorProductoID(detalle.getProducto().getId());
+                List<Integer> proveedorIDs = this.ICP.obtenerProveedoresPorProductoID(detalle.getProducto().getId());
                 List<Proveedor> proveedores = new ArrayList<>();
 
                 for (int proveedorID : proveedorIDs) {
                     //obtenbemos el proveedor correspondiente
-                    Proveedor proveedor = proveedorServicios.getProveedor(proveedorID);
+                    Proveedor proveedor = this.ICPro.getProveedor(proveedorID);
                     if (proveedor != null) {
                         proveedores.add(proveedor);
                     }

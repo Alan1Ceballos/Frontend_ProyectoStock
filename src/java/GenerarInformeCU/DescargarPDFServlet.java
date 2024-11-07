@@ -13,13 +13,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import logica.Clases.DetallePedido;
 import logica.Clases.Pedido;
-import logica.servicios.CategoriaServicios;
-import logica.servicios.ClienteServicios;
-import logica.servicios.DetallePedidoServicios;
-import logica.servicios.PedidosServicios;
-import logica.servicios.ProductoServicios;
+
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Paragraph;
@@ -28,14 +25,21 @@ import com.itextpdf.text.pdf.PdfWriter;
 import java.text.SimpleDateFormat;
 import java.util.stream.Collectors;
 
+import logica.Fabrica;
+import logica.Interfaces.IControladorCategoria;
+import logica.Interfaces.IControladorCliente;
+import logica.Interfaces.IControladorDetallePedido;
+import logica.Interfaces.IControladorPedido;
+import logica.Interfaces.IControladorProducto;
+
 @WebServlet(urlPatterns = {"/descargarPDF"})
 public class DescargarPDFServlet extends HttpServlet {
 
-    private PedidosServicios pedidosServicios = new PedidosServicios();
-    private ProductoServicios productoServicios = new ProductoServicios();
-    private DetallePedidoServicios detallePedidosServicios = new DetallePedidoServicios();
-    private ClienteServicios clienteServicios = new ClienteServicios();
-    private CategoriaServicios categoriaServicios = new CategoriaServicios();
+    private IControladorPedido ICP = Fabrica.getInstance().getIControladorPedido();
+    private IControladorProducto ICPr = Fabrica.getInstance().getIControladorProducto();
+    private IControladorDetallePedido ICDP = Fabrica.getInstance().getIControladorDetallePedido();
+    private IControladorCliente ICC = Fabrica.getInstance().getIControladorCliente();
+    private IControladorCategoria ICCat = Fabrica.getInstance().getIControladorCategoria();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -51,9 +55,9 @@ public class DescargarPDFServlet extends HttpServlet {
                 int anio = Integer.parseInt(request.getParameter("anio"));
 
                 Integer clienteId = (nombreCliente != null && !nombreCliente.trim().isEmpty())
-                        ? clienteServicios.obtenerIdPorNombre(nombreCliente) : null;
+                        ? this.ICC.obtenerIdPorNombre(nombreCliente) : null;
                 Integer categoriaId = (nombreCategoria != null && !nombreCategoria.trim().isEmpty())
-                        ? categoriaServicios.obtenerIdPorNombre(nombreCategoria) : null;
+                        ? this.ICCat.obtenerIdPorNombre(nombreCategoria) : null;
 
                 List<Pedido> pedidosVendedor = obtenerPedidosFiltrados(idVendedor, mes, anio, clienteId, categoriaId);
                 List<DetallePedido> detallesAgrupados = agruparDetallesPedidos(pedidosVendedor);
@@ -75,13 +79,13 @@ public class DescargarPDFServlet extends HttpServlet {
         List<Pedido> pedidosFiltrados = new ArrayList<>();
 
         if (clienteId != null && categoriaId != null) {
-            pedidosFiltrados = pedidosServicios.getPedidosPorVendedorTodos(idVendedor, mes, anio, categoriaId, clienteId);
+            pedidosFiltrados = this.ICP.getPedidosPorVendedorTodos(idVendedor, mes, anio, categoriaId, clienteId);
         } else if (clienteId != null) {
-            pedidosFiltrados = pedidosServicios.getPedidosPorVendedorClienteYFecha(idVendedor, mes, anio, clienteId);
+            pedidosFiltrados = this.ICP.getPedidosPorVendedorClienteYFecha(idVendedor, mes, anio, clienteId);
         } else if (categoriaId != null) {
-            pedidosFiltrados = pedidosServicios.getPedidosPorVendedorCategoriaYFecha(idVendedor, mes, anio, categoriaId);
+            pedidosFiltrados = this.ICP.getPedidosPorVendedorCategoriaYFecha(idVendedor, mes, anio, categoriaId);
         } else {
-            pedidosFiltrados = pedidosServicios.getPedidosPorVendedorYFecha(idVendedor, mes, anio);
+            pedidosFiltrados = this.ICP.getPedidosPorVendedorYFecha(idVendedor, mes, anio);
         }
 
         // Filtrar solo los pedidos entregados
@@ -91,7 +95,7 @@ public class DescargarPDFServlet extends HttpServlet {
     private List<DetallePedido> agruparDetallesPedidos(List<Pedido> pedidosVendedor) {
         List<DetallePedido> todosDetalles = new ArrayList<>();
         for (Pedido pedido : pedidosVendedor) {
-            List<DetallePedido> detalles = detallePedidosServicios.obtenerDetallesPedido(pedido.getIdentificador());
+            List<DetallePedido> detalles = this.ICDP.obtenerDetallesPedido(pedido.getIdentificador());
             todosDetalles.addAll(detalles);
         }
         return todosDetalles;
@@ -138,7 +142,7 @@ public class DescargarPDFServlet extends HttpServlet {
             tablePedidos.addCell(fechaFormateada);
             tablePedidos.addCell(traducirEstado(pedido.getEstado().toString()));
             tablePedidos.addCell("$" + String.format("%.2f", pedido.getTotal())); // Formatear subtotal
-            tablePedidos.addCell(clienteServicios.getNombreClientePorId(pedido.getIdCliente()));
+            tablePedidos.addCell(this.ICC.getNombreClientePorId(pedido.getIdCliente()));
         }
 
         document.add(tablePedidos);
@@ -184,7 +188,7 @@ public class DescargarPDFServlet extends HttpServlet {
 // Método para calcular el subtotal del pedido
     private float calcularSubtotalPedido(Pedido pedido) {
         float subtotal = 0;
-        List<DetallePedido> detallesPedido = detallePedidosServicios.obtenerDetallesPedido(pedido.getIdentificador());
+        List<DetallePedido> detallesPedido = this.ICDP.obtenerDetallesPedido(pedido.getIdentificador());
         for (DetallePedido detalle : detallesPedido) {
             subtotal += detalle.getPrecioVenta() * detalle.getCantidad();
         }

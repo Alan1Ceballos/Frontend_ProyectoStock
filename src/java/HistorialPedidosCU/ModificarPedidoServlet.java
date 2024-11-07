@@ -14,16 +14,17 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import logica.servicios.PedidosServicios;
-import logica.servicios.DetallePedidoServicios;
-import logica.servicios.ProductoServicios;
+import logica.Fabrica;
+import logica.Interfaces.IControladorDetallePedido;
+import logica.Interfaces.IControladorPedido;
+import logica.Interfaces.IControladorProducto;
 
 @WebServlet("/modificarPedido")
 public class ModificarPedidoServlet extends HttpServlet {
 
-    private PedidosServicios pedidoServicios = new PedidosServicios();
-    private DetallePedidoServicios detallesPedidos = new DetallePedidoServicios();
-    private ProductoServicios productosDetalles = new ProductoServicios();
+    private IControladorPedido ICP = Fabrica.getInstance().getIControladorPedido();
+    private IControladorDetallePedido ICDP = Fabrica.getInstance().getIControladorDetallePedido();
+    private IControladorProducto ICPr = Fabrica.getInstance().getIControladorProducto();
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
@@ -66,7 +67,7 @@ public class ModificarPedidoServlet extends HttpServlet {
                         int cantidad = Integer.parseInt(cantidadesProducto[i].trim());
                         float precioVenta = Float.parseFloat(preciosVenta[i].trim());
 
-                        Producto producto = productosDetalles.buscarProducto(idProducto);
+                        Producto producto = this.ICPr.buscarProducto(idProducto);
                         detalles.add(new DetallePedido(cantidad, precioVenta, producto, pedido.getIdentificador()));
                     }
                 }
@@ -75,8 +76,8 @@ public class ModificarPedidoServlet extends HttpServlet {
             }
 
             // Actualizar el pedido
-            boolean resultadoPedido = pedidoServicios.actualizarPedido(pedido);
-            boolean resultadoDetalles = detallesPedidos.actualizarDetallesPedido(pedido.getIdentificador(), detalles);
+            boolean resultadoPedido = this.ICP.actualizarPedido(pedido);
+            boolean resultadoDetalles = this.ICDP.actualizarDetallesPedido(pedido.getIdentificador(), detalles);
 
             if (resultadoPedido && resultadoDetalles) {
                 // La actualización fue exitosa

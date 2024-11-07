@@ -13,13 +13,15 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfWriter;
-import logica.servicios.PedidosServicios;
+
 import logica.Clases.DetallePedido;
+import logica.Fabrica;
+import logica.Interfaces.IControladorPedido;
 
 @WebServlet(urlPatterns = {"/generarInformeProductos"})
 public class GenerarInformeProductosServlet extends HttpServlet {
 
-    private PedidosServicios pedidoServicios = new PedidosServicios();
+    private IControladorPedido ICP = Fabrica.getInstance().getIControladorPedido();
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -49,7 +51,7 @@ public class GenerarInformeProductosServlet extends HttpServlet {
             addCell(table, "Subtotal", true); // Nueva columna para subtotal
 
             // Obtener los detalles del pedido (productos) usando el ID del pedido
-            List<DetallePedido> detallesPedido = pedidoServicios.obtenerDetallesPedido(idPedido);
+            List<DetallePedido> detallesPedido = this.ICP.obtenerDetallesPedido(idPedido);
             float totalBoleta = 0; // Para calcular el total
 
             for (DetallePedido detalle : detallesPedido) {

@@ -16,7 +16,9 @@ import logica.Interfaces.IControladorVendedor;
 
 @WebServlet(urlPatterns = {"/login"})
 public class LoginServlet extends HttpServlet {
-
+    
+    private IControladorVendedor ICV = Fabrica.getInstance().getIControladorVendedor();
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -34,8 +36,7 @@ public class LoginServlet extends HttpServlet {
             // Validamos las credenciales del usuario
             if (validateUsuario(userName, password)) {
                 // Obtenemos el ID del vendedor a través del controlador
-                IControladorVendedor controladorVendedor = Fabrica.getInstance().getIControladorVendedor();
-                Integer idVendedor = controladorVendedor.obtenerIdPorUsuario(userName);
+                Integer idVendedor = this.ICV.obtenerIdPorUsuario(userName);
 
                 // Creamos la sesión y guardamos el usuario y el idVendedor
                 HttpSession session = request.getSession();
@@ -58,10 +59,8 @@ public class LoginServlet extends HttpServlet {
 
     // Método para validar las credenciales del usuario
     private boolean validateUsuario(String username, String password) {
-        // Obtenemos instancia del controlador de vendedores
-        IControladorVendedor controladorVendedor = Fabrica.getInstance().getIControladorVendedor();
         // Validamos las credenciales con la contraseña encriptada
-        return controladorVendedor.validarCredenciales(username, password);
+        return this.ICV.validarCredenciales(username, password);
     }
 
     @Override

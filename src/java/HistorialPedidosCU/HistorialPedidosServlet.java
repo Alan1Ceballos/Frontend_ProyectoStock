@@ -4,9 +4,7 @@ package HistorialPedidosCU;
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.RequestDispatcher;
@@ -19,7 +17,7 @@ import javax.servlet.http.HttpSession;
 import logica.Clases.DetallePedido;
 import logica.Clases.Pedido;
 import logica.Fabrica;
-import logica.servicios.DetallePedidoServicios;
+import logica.Interfaces.IControladorDetallePedido;
 
 /**
  *
@@ -28,6 +26,8 @@ import logica.servicios.DetallePedidoServicios;
 @WebServlet(urlPatterns = {"/historialpedidos"})
 public class HistorialPedidosServlet extends HttpServlet {
 
+    private IControladorDetallePedido ICDP = Fabrica.getInstance().getIControladorDetallePedido();
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
@@ -42,9 +42,8 @@ public class HistorialPedidosServlet extends HttpServlet {
         ArrayList<Pedido> pedidosVendedor = fabrica.getIControladorPedido().getPedidosPorVendedor(idVendedor);
 
         //obtenemos detalles para cada pedido
-        DetallePedidoServicios detalleServicios = new DetallePedidoServicios();
         for (Pedido pedido : pedidosVendedor) {
-            List<DetallePedido> detalles = detalleServicios.obtenerDetallesPedido(pedido.getIdentificador());
+            List<DetallePedido> detalles = this.ICDP.obtenerDetallesPedido(pedido.getIdentificador());
             for (DetallePedido detalle : detalles) {
                 pedido.agregarDetalle(detalle);
             }

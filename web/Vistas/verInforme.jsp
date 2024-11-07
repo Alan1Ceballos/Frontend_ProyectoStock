@@ -4,10 +4,10 @@
     Author     : AlanCeballos
 --%>
 
+<%@page import="logica.Interfaces.IControladorCliente"%>
+<%@page import="logica.Fabrica"%>
 <%@page import="logica.Clases.DetallePedido"%>
 <%@page import="java.util.List"%>
-<%@page import="logica.servicios.DetallePedidoServicios"%>
-<%@page import="logica.servicios.ClienteServicios"%>
 <%@page import="logica.Clases.Pedido"%>
 <%@page import="java.util.ArrayList"%>
 <%@page contentType="text/html;charset=UTF-8" language="java" %>
@@ -19,6 +19,8 @@
         return;
     }
     String usuario = (String) session.getAttribute("usuario");
+    
+    IControladorCliente ICC = Fabrica.getInstance().getIControladorCliente();
 %>
 
 <!DOCTYPE html>
@@ -78,7 +80,6 @@
                 <tbody>
                     <%
                         ArrayList<Pedido> pedidos = (ArrayList<Pedido>) request.getAttribute("pedidos");
-                        ClienteServicios clienteServicios = new ClienteServicios();
                         if (pedidos != null && !pedidos.isEmpty()) {
                             for (Pedido pedido : pedidos) {
                                 String estadoPedido;
@@ -100,7 +101,7 @@
                                         break;
                                 }
 
-                                String nombreCliente = clienteServicios.getNombreClientePorId(pedido.getIdCliente());
+                                String nombreCliente = ICC.getNombreClientePorId(pedido.getIdCliente());
                     %>
                     <tr>
                         <td><%= pedido.getIdentificador()%></td>

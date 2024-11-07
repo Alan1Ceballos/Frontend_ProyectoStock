@@ -38,16 +38,16 @@ public class CrearPedidoServlet extends HttpServlet {
             throws ServletException, IOException {
 
         // Crear una instancia para obtener los clientes y servicios
-        ArrayList<Cliente> listaDeClientes = controladorCliente.getClientesActivos();
-        ArrayList<Producto> listaDeProductos = controladorProducto.listarProductosActivos();
+        ArrayList<Cliente> listaDeClientes = this.controladorCliente.getClientesActivos();
+        ArrayList<Producto> listaDeProductos = this.controladorProducto.listarProductosActivos();
         
         // Obtener las categorías activas
-        ArrayList<Categoria> listaDeCategorias = controladorCategoria.listarCategoriasActivas();
+        ArrayList<Categoria> listaDeCategorias = this.controladorCategoria.listarCategoriasActivas();
 
         // Aquí llamamos a la función para obtener el ID del cliente por nombre
         ArrayList<Integer> idsClientes = new ArrayList<>();
         for (Cliente cliente : listaDeClientes) {
-            int idCliente = controladorCliente.obtenerIdClientePorNombre(cliente.getNom_empresa());
+            int idCliente = this.controladorCliente.obtenerIdClientePorNombre(cliente.getNom_empresa());
             idsClientes.add(idCliente);
         }
         
@@ -94,7 +94,7 @@ public class CrearPedidoServlet extends HttpServlet {
         // Añadir los productos seleccionados al carrito
         if (productosSeleccionados != null) {
             for (String productoId : productosSeleccionados) {
-                Producto producto = controladorProducto.buscarProducto(Integer.parseInt(productoId));
+                Producto producto = this.controladorProducto.buscarProducto(Integer.parseInt(productoId));
 
                 // Crear un DetallePedido con el producto y la cantidad
                 DetallePedido detalle = new DetallePedido(cantidad, producto.getPrecioVenta(), producto, 0);

@@ -15,13 +15,14 @@ import logica.Clases.Producto;
 @WebServlet(urlPatterns = {"/listadoProductos"})
 public class ListarProductosServlet extends HttpServlet {
 
+    private IControladorProducto ICP = Fabrica.getInstance().getIControladorProducto();
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
             // Obtenemos la instancia del controlador de productos
-            IControladorProducto controladorProducto = Fabrica.getInstance().getIControladorProducto();
-            List<Producto> productos = controladorProducto.listarProductosActivos();
+            List<Producto> productos = this.ICP.listarProductosActivos();
 
             // Guardamos el listado de productos en el request
             request.setAttribute("productos", productos);

@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,16 +19,18 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import logica.Clases.DetallePedido;
 import logica.Clases.Pedido;
 import logica.Clases.Proveedor;
+
 import logica.Fabrica;
-import logica.servicios.CategoriaServicios;
-import logica.servicios.ClienteServicios;
-import logica.servicios.DetallePedidoServicios;
-import logica.servicios.PedidosServicios;
-import logica.servicios.ProductoServicios;
-import logica.servicios.ProveedorServicios;
+import logica.Interfaces.IControladorCategoria;
+import logica.Interfaces.IControladorCliente;
+import logica.Interfaces.IControladorDetallePedido;
+import logica.Interfaces.IControladorPedido;
+import logica.Interfaces.IControladorProducto;
+import logica.Interfaces.IControladorProveedor;
 
 /**
  *
@@ -36,12 +39,12 @@ import logica.servicios.ProveedorServicios;
 @WebServlet(urlPatterns = {"/verInforme"})
 public class VerInformeServlet extends HttpServlet {
 
-    private PedidosServicios pedidosServicios = new PedidosServicios();
-    private ProductoServicios productoServicios = new ProductoServicios();
-    private ProveedorServicios proveedorServicios = new ProveedorServicios();
-    private DetallePedidoServicios detallePedidosServicios = new DetallePedidoServicios();
-    private ClienteServicios clienteServicios = new ClienteServicios();
-    private CategoriaServicios categoriaServicios = new CategoriaServicios();
+    private IControladorPedido ICP = Fabrica.getInstance().getIControladorPedido();
+    private IControladorProducto ICPr = Fabrica.getInstance().getIControladorProducto();
+    private IControladorProveedor ICPro = Fabrica.getInstance().getIControladorProveedor();
+    private IControladorDetallePedido ICDP = Fabrica.getInstance().getIControladorDetallePedido();
+    private IControladorCliente ICC = Fabrica.getInstance().getIControladorCliente();
+    private IControladorCategoria ICCat = Fabrica.getInstance().getIControladorCategoria();
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -60,37 +63,37 @@ public class VerInformeServlet extends HttpServlet {
                 Integer categoriaId = null;
 
                 if (nombreCliente != null && !nombreCliente.isEmpty()) {
-                    clienteId = clienteServicios.obtenerIdPorNombre(nombreCliente);
+                    clienteId = this.ICC.obtenerIdPorNombre(nombreCliente);
                 }
 
                 if (nombreCategoria != null && !nombreCategoria.isEmpty()) {
-                    categoriaId = categoriaServicios.obtenerIdPorNombre(nombreCategoria);
+                    categoriaId = this.ICCat.obtenerIdPorNombre(nombreCategoria);
                 }
 
                 List<Pedido> pedidosVendedor;
                 if (clienteId != null && categoriaId != null) {
                     // Filter by month, year, customer, and category
-                    pedidosVendedor = pedidosServicios.getPedidosPorVendedorTodos(idVendedor, mes, anio, categoriaId, clienteId);
+                    pedidosVendedor = this.ICP.getPedidosPorVendedorTodos(idVendedor, mes, anio, categoriaId, clienteId);
                 } else if (clienteId != null) {
                     // Filter by month, year, and customer
-                    pedidosVendedor = pedidosServicios.getPedidosPorVendedorClienteYFecha(idVendedor, mes, anio, clienteId);
+                    pedidosVendedor = this.ICP.getPedidosPorVendedorClienteYFecha(idVendedor, mes, anio, clienteId);
                 } else if (categoriaId != null) {
                     // Filter by month, year, and category
-                    pedidosVendedor = pedidosServicios.getPedidosPorVendedorCategoriaYFecha(idVendedor, mes, anio, categoriaId);
+                    pedidosVendedor = this.ICP.getPedidosPorVendedorCategoriaYFecha(idVendedor, mes, anio, categoriaId);
                 } else {
                     // Filter by month and year only
-                    pedidosVendedor = pedidosServicios.getPedidosPorVendedorYFecha(idVendedor, mes, anio);
+                    pedidosVendedor = this.ICP.getPedidosPorVendedorYFecha(idVendedor, mes, anio);
                 }
 
                 List<DetallePedido> todosDetalles = new ArrayList<>();
 
                 for (Pedido pedido : pedidosVendedor) {
-                    List<DetallePedido> detalles = detallePedidosServicios.obtenerDetallesPedido(pedido.getIdentificador());
+                    List<DetallePedido> detalles = this.ICDP.obtenerDetallesPedido(pedido.getIdentificador());
                     for (DetallePedido detalle : detalles) {
-                        List<Integer> proveedorIDs = productoServicios.obtenerProveedoresPorProductoID(detalle.getProducto().getId());
+                        List<Integer> proveedorIDs = this.ICPr.obtenerProveedoresPorProductoID(detalle.getProducto().getId());
                         List<Proveedor> proveedores = new ArrayList<>();
                         for (Integer proveedorID : proveedorIDs) {
-                            Proveedor proveedor = proveedorServicios.getProveedor(proveedorID);
+                            Proveedor proveedor = this.ICPro.getProveedor(proveedorID);
                             if (proveedor != null) {
                                 proveedores.add(proveedor);
                             }
