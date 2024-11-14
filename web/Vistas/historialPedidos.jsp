@@ -5,38 +5,50 @@
 <%@page import="java.util.List"%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page contentType="text/html;charset=UTF-8" language="java" %>
+<%@page import="java.util.ArrayList"%>
+<%@page import="java.util.List" %>
+<%@page import="com.google.gson.JsonArray" %>
+<%@page import="com.google.gson.JsonObject" %>
+<%@page contentType="text/html;charset=UTF-8" language="java" %>
 <%
-    // Verifica si hay una sesión activa
+    //verificamos si hay una sesión activa
     if (session == null || session.getAttribute("usuario") == null) {
-        // Redirige a Login.jsp si el usuario no está autenticado
+        //redirigimos a Login.jsp si el usuario no está autenticado
         response.sendRedirect("Login.jsp");
         return;
     }
 
-    // Obtener el número de página desde los parámetros de la solicitud
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+    //obtenemos el número de página desde los parámetros de la solicitud
     String pageParam = request.getParameter("page");
     int paginaActual = (pageParam != null) ? Integer.parseInt(pageParam) : 1;
     int filasPorPagina = 10;
 
-    // Obtener la lista de pedidos
-    ArrayList<Pedido> pedidos = (ArrayList<Pedido>) request.getAttribute("pedidos");
-    if (pedidos == null) {
-        pedidos = new ArrayList<>(); // Iniciar como lista vacía si es null
+    //obtenemos el listado de pedidos desde el request (proviene del servlet)
+    JsonArray pedidosJson = (JsonArray) request.getAttribute("pedidos");
+
+    //verificamos si pedidosJson es null
+    if (pedidosJson == null) {
+        pedidosJson = new JsonArray(); //inciamos como lista vacía si es null
     }
 
-    // Calcular el índice de inicio y fin para la paginación
+    //convertimos JsonArray a una lista de pedidos para manejo en la JSP
+    List<JsonObject> pedidos = new ArrayList<>();
+    for (int i = 0; i < pedidosJson.size(); i++) {
+        pedidos.add(pedidosJson.get(i).getAsJsonObject());
+    }
+
+    //calculamos el índice de inicio y fin para la paginación
     int totalPedidos = pedidos.size();
     int totalPaginas = (int) Math.ceil((double) totalPedidos / filasPorPagina);
     int inicio = (paginaActual - 1) * filasPorPagina;
     int fin = Math.min(inicio + filasPorPagina, totalPedidos);
 
-    // Filtrar la lista de pedidos para mostrar solo la página actual
-    List<Pedido> pedidosPagina = pedidos.subList(inicio, fin);
-    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+    //filtramos la lista de pedidos para mostrar solo la página actual
+    List<JsonObject> pedidosPagina = pedidos.subList(inicio, fin);
 
     String usuario = (String) session.getAttribute("usuario");
-    
-    IControladorCliente ICC = Fabrica.getInstance().getIControladorCliente();
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -103,46 +115,47 @@
                 <tbody>
                     <%
                         if (pedidosPagina != null && !pedidosPagina.isEmpty()) {
-                            for (Pedido pedido : pedidosPagina) {
+                            for (JsonObject pedidoJson : pedidosPagina) {
                                 String estadoPedido;
-                                switch (pedido.getEstado()) {
-                                    case EN_PREPARACION:
+                                String estadoJson = pedidoJson.get("estado").getAsString();
+
+                                switch (estadoJson) {
+                                    case "EN_PREPARACION":
                                         estadoPedido = "En Preparación";
                                         break;
-                                    case EN_VIAJE:
+                                    case "EN_VIAJE":
                                         estadoPedido = "En Viaje";
                                         break;
-                                    case ENTREGADO:
+                                    case "ENTREGADO":
                                         estadoPedido = "Entregado";
                                         break;
-                                    case CANCELADO:
+                                    case "CANCELADO":
                                         estadoPedido = "Cancelado";
                                         break;
                                     default:
                                         estadoPedido = "Estado Desconocido"; // por si hay un estado no esperado
                                         break;
                                 }
-
-                                // Obtener el nombre del cliente usando el ID
-                                String nombreCliente = ICC.getNombreClientePorId(pedido.getIdCliente());
+                                
+                                //obtenemos el nombre del cliente desde el JSON
+                                String nombreCliente = pedidoJson.has("nombreCliente") ? pedidoJson.get("nombreCliente").getAsString() : "Desconocido";
                     %>
                     <tr>
-                        <td><%= dateFormat.format(pedido.getFechaPedido())%></td>
+                        <td><%= dateFormat.format(new java.util.Date(pedidoJson.get("fechaPedido").getAsLong()))%></td>
                         <td class="estadoPedido" data-estado="<%= estadoPedido%>"><%= estadoPedido%></td>
-                        <td>$<%= String.format("%.2f", pedido.getTotal())%></td>
-                        <td><%= nombreCliente != null ? nombreCliente : "Desconocido"%></td>
+                        <td>$<%= String.format("%.2f", pedidoJson.get("total").getAsDouble())%></td>
+                        <td><%= nombreCliente %></td>
                         <td>
-
                             <form action="${pageContext.request.contextPath}/verdetalles" method="get" style="display:inline;">
-                                <input type="hidden" name="idPedido" value="<%= pedido.getIdentificador()%>">
+                                <input type="hidden" name="idPedido" value="<%= pedidoJson.get("identificador").getAsInt()%>">
                                 <button type="submit" class="btn btn-primary">Ver Detalles</button>
                             </form>
                             <form action="${pageContext.request.contextPath}/Vistas/modificarPedido.jsp" method="post" style="display:inline;">
-                                <input type="hidden" name="idPedido" value="<%= pedido.getIdentificador()%>">
+                                <input type="hidden" name="idPedido" value="<%= pedidoJson.get("identificador").getAsInt()%>">
                                 <button type="submit" class="btn btn-warning">Modificar Pedido</button>
                             </form>
                             <form action="${pageContext.request.contextPath}/cancelarPedido" method="post" style="display:inline;" onsubmit="return confirmarCancelacion();">
-                                <input type="hidden" name="idPedido" value="<%= pedido.getIdentificador()%>">
+                                <input type="hidden" name="idPedido" value="<%= pedidoJson.get("identificador").getAsInt()%>">
                                 <button type="submit" class="btn btn-danger">Cancelar Pedido</button>
                             </form>
                         </td>
@@ -160,6 +173,7 @@
                 </tbody>
             </table>
         </div>
+
 
         <script>
             function confirmarCancelacion() {
@@ -214,7 +228,7 @@
                 for (int i = inicioPaginas; i <= finPaginas; i++) {
                     // Verifica si el botón es el de la página actual
                     String activeClass = (i == paginaActual) ? "btn-primary" : "btn-outline-secondary"; // Cambiar la clase del botón
-%>
+            %>
             <a href="historialpedidos?page=<%= i%>" class="btn <%= activeClass%> btn-sm mx-1"><%= i%></a>
             <%
                 }

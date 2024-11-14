@@ -1,33 +1,28 @@
 package ListadoProductosCU;
 
+import Persistencia.ConexionAPI;
+import com.google.gson.JsonArray;
 import java.io.IOException;
-import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import logica.Fabrica;
-import logica.Interfaces.IControladorProducto;
-import logica.Clases.Producto;
-
 @WebServlet(urlPatterns = {"/listadoProductos"})
 public class ListarProductosServlet extends HttpServlet {
 
-    private IControladorProducto ICP = Fabrica.getInstance().getIControladorProducto();
-    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            // Obtenemos la instancia del controlador de productos
-            List<Producto> productos = this.ICP.listarProductosActivos();
+            //obtenemos el listado de productos desde el API
+            JsonArray productos = ConexionAPI.getRequest("/productos/");
 
-            // Guardamos el listado de productos en el request
+            //guardamos el listado de productos en el request
             request.setAttribute("productos", productos);
 
-            // Redirigimos a la página JSP para mostrar el listado
+            //redirigmos a la página JSP para mostrar el listado
             request.getRequestDispatcher("Vistas/listadoProductos.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();

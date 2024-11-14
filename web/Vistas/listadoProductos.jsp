@@ -1,7 +1,7 @@
 <%@page import="java.util.ArrayList"%>
-<%@page import="java.text.SimpleDateFormat"%>
 <%@page import="java.util.List" %>
-<%@page import="logica.Clases.Producto" %>
+<%@page import="com.google.gson.JsonArray" %>
+<%@page import="com.google.gson.JsonObject" %>
 <%@page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     // Verifica si hay una sesión activa
@@ -16,12 +16,18 @@
     int paginaActual = (pageParam != null) ? Integer.parseInt(pageParam) : 1;
     int filasPorPagina = 10;
 
-    // Lógica para obtener todos los productos de la base de datos
-    List<Producto> productos = (List<Producto>) request.getAttribute("productos");
+    // Obtener el listado de productos desde el request (proviene del servlet)
+    JsonArray productosJson = (JsonArray) request.getAttribute("productos");
 
     // Verificar si productos es null
-    if (productos == null) {
-        productos = new ArrayList<>(); // Iniciar como lista vacía si es null
+    if (productosJson == null) {
+        productosJson = new JsonArray(); // Iniciar como lista vacía si es null
+    }
+
+    // Convertir JsonArray a una lista de productos para manejo en la JSP
+    List<JsonObject> productos = new ArrayList<>();
+    for (int i = 0; i < productosJson.size(); i++) {
+        productos.add(productosJson.get(i).getAsJsonObject());
     }
 
     // Calcular el índice de inicio y fin para la paginación
@@ -31,7 +37,7 @@
     int fin = Math.min(inicio + filasPorPagina, totalProductos);
 
     // Filtrar la lista de productos para mostrar solo la página actual
-    List<Producto> productosPagina = productos.subList(inicio, fin);
+    List<JsonObject> productosPagina = productos.subList(inicio, fin);
 
     String usuario = (String) session.getAttribute("usuario");
 %>
@@ -103,19 +109,39 @@
                 </thead>
                 <tbody>
                     <%
-                        for (Producto producto : productosPagina) {
+                        for (JsonObject productoJson : productosPagina) {
+                            //verificacion de null antes de acceder a los valores
+                            String nombre = (productoJson.has("nombre") && !productoJson.get("nombre").isJsonNull())
+                                    ? productoJson.get("nombre").getAsString()
+                                    : "No disponible";
+
+                            String descripcion = (productoJson.has("descripcion") && !productoJson.get("descripcion").isJsonNull())
+                                    ? productoJson.get("descripcion").getAsString()
+                                    : "No disponible";
+
+                            String sku = (productoJson.has("sku") && !productoJson.get("sku").isJsonNull())
+                                    ? productoJson.get("sku").getAsString()
+                                    : "No disponible";
+
+                            double precioVenta = (productoJson.has("precioVenta") && !productoJson.get("precioVenta").isJsonNull())
+                                    ? productoJson.get("precioVenta").getAsDouble()
+                                    : 0.0;
+
+                            int stock = (productoJson.has("stock") && !productoJson.get("stock").isJsonNull())
+                                    ? productoJson.get("stock").getAsInt()
+                                    : 0;
                     %>
                     <tr>
-                        <td><%= producto.getNombre()%></td>
-                        <td><%= producto.getDescripcion()%></td>
-                        <td><%= producto.getSKU()%></td>
-                        <td>$<%= String.format("%.2f", producto.getPrecioVenta())%></td>
-                        <td><%= producto.getStock()%></td>
+                        <td><%= nombre%></td>
+                        <td><%= descripcion%></td>
+                        <td><%= sku%></td>
+                        <td>$<%= String.format("%.2f", precioVenta)%></td>
+                        <td><%= stock%></td>
                     </tr>
-
                     <%
                         }
                     %>
+
                 </tbody>
             </table>
             <%
@@ -126,6 +152,7 @@
                 }
             %>
         </div>
+
         <div class="d-flex justify-content-center align-items-center pagination">
             <%
                 int rango = 1;

@@ -1,12 +1,8 @@
 package HistorialPedidosCU;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import Persistencia.ConexionAPI;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,43 +10,50 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import logica.Clases.DetallePedido;
-import logica.Clases.Pedido;
-import logica.Fabrica;
-import logica.Interfaces.IControladorDetallePedido;
+import java.io.IOException;
 
-/**
- *
- * @author AlanCeballos
- */
 @WebServlet(urlPatterns = {"/historialpedidos"})
 public class HistorialPedidosServlet extends HttpServlet {
 
-    private IControladorDetallePedido ICDP = Fabrica.getInstance().getIControladorDetallePedido();
-    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         Integer idVendedor = (Integer) (session != null ? session.getAttribute("idVendedor") : null);
 
+        //redirige al login si no hay un vendedor en sesión
         if (idVendedor == null) {
             response.sendRedirect("Login.jsp");
             return;
         }
 
-        Fabrica fabrica = Fabrica.getInstance();
-        ArrayList<Pedido> pedidosVendedor = fabrica.getIControladorPedido().getPedidosPorVendedor(idVendedor);
+        try {
+            //llama al servicio REST para obtener los pedidos del vendedor
+            JsonArray pedidosVendedor = ConexionAPI.getRequest("/pedidos/vendedor/" + idVendedor);
 
-        //obtenemos detalles para cada pedido
-        for (Pedido pedido : pedidosVendedor) {
-            List<DetallePedido> detalles = this.ICDP.obtenerDetallesPedido(pedido.getIdentificador());
-            for (DetallePedido detalle : detalles) {
-                pedido.agregarDetalle(detalle);
+            //paca cada pedido, obtenemos los detalles y los agregamos al pedido correspondiente
+            for (int i = 0; i < pedidosVendedor.size(); i++) {
+                JsonObject pedido = pedidosVendedor.get(i).getAsJsonObject();
+                int idPedido = pedido.get("identificador").getAsInt();
+                
+                //obtener los detalles del pedido y añadirlos al objeto JsonObject del pedido
+                JsonArray detalles = ConexionAPI.getRequest("/pedidos/" + idPedido + "/detalles");
+                pedido.add("detalles", detalles);
             }
-        }
 
-        request.setAttribute("pedidos", pedidosVendedor);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("Vistas/historialPedidos.jsp");
-        dispatcher.forward(request, response);
+            //guarda el listado de pedidos en el request
+            request.setAttribute("pedidos", pedidosVendedor);
+            RequestDispatcher dispatcher = request.getRequestDispatcher("Vistas/historialPedidos.jsp");
+            dispatcher.forward(request, response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "Error al obtener el historial de pedidos.");
+            request.getRequestDispatcher("Vistas/historialPedidos.jsp").forward(request, response);
+        }
+    }
+
+    @Override
+    public String getServletInfo() {
+        return "Servlet que maneja el historial de pedidos usando JsonArray.";
     }
 }

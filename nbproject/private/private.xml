@@ -2,6 +2,10 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/C:/Users/cebal/Desktop/Frontend_ProyectoStock/src/java/ListadoProductosCU/ListarProductosServlet.java</file>
+            <file>file:/C:/Users/cebal/Desktop/Frontend_ProyectoStock/web/Scripts/listadoProductos.js</file>
+            <file>file:/C:/Users/cebal/Desktop/Frontend_ProyectoStock/src/java/Persistencia/ConexionAPI.java</file>
+        </group>
     </open-files>
 </project-private>
