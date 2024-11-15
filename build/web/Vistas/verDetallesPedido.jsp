@@ -1,10 +1,7 @@
+<%@ page import="com.google.gson.JsonArray" %>
+<%@ page import="com.google.gson.JsonObject" %>
 <%@ page import="java.util.Base64" %>
 <%@ page import="java.util.List" %>
-<%@ page import="logica.Clases.Pedido" %>
-<%@ page import="logica.Clases.DetallePedido" %>
-<%@ page import="logica.Clases.Proveedor" %>
-<%@ page import="logica.Clases.Producto" %>
-<%@ page import="java.util.ArrayList" %>
 <%@page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%
@@ -20,34 +17,33 @@
     int paginaActual = (pageParam != null) ? Integer.parseInt(pageParam) : 1;
     int filasPorPagina = 10;
 
-    // Obtener la lista de detalles
-    List<DetallePedido> detalles = (List<DetallePedido>) request.getAttribute("detalles");
-    if (detalles == null) {
-        detalles = new ArrayList<>(); // Iniciar como lista vacía si es null
+    // Obtener el parámetro "detalles" como un JsonArray
+    JsonArray detallesArray = (JsonArray) request.getAttribute("detalles");
+    if (detallesArray == null) {
+        detallesArray = new JsonArray(); // Inicializar como un JsonArray vacío si es null
     }
 
     // Inicializa el total del pedido
-    double totalPedido = 0; // Inicializa la variable total
+    double totalPedido = 0;
 
     // Calcular el total de todos los detalles (sin paginación)
-    for (DetallePedido detalle : detalles) {
-        double cantidad = detalle.getCantidad();
-        double precioUnitario = detalle.getPrecioVenta();
-        double subtotal = cantidad * precioUnitario; // Calcular subtotal
-        totalPedido += subtotal; // Sumar al total del pedido
+    for (int i = 0; i < detallesArray.size(); i++) {
+        JsonObject detalle = detallesArray.get(i).getAsJsonObject();
+
+        double cantidad = detalle.has("cantidad") && !detalle.get("cantidad").isJsonNull() ? detalle.get("cantidad").getAsDouble() : 0;
+        double precioUnitario = detalle.has("precioVenta") && !detalle.get("precioVenta").isJsonNull() ? detalle.get("precioVenta").getAsDouble() : 0;
+        double subtotal = cantidad * precioUnitario;
+        totalPedido += subtotal;
     }
 
     // Calcular el índice de inicio y fin para la paginación
-    int totalDetalles = detalles.size();
+    int totalDetalles = detallesArray.size();
     int totalPaginas = (int) Math.ceil((double) totalDetalles / filasPorPagina);
     int inicio = (paginaActual - 1) * filasPorPagina;
     int fin = Math.min(inicio + filasPorPagina, totalDetalles);
 
-    // Filtrar la lista de detalles para mostrar solo la página actual
-    List<DetallePedido> detallesPagina = detalles.subList(inicio, fin);
-
     String usuario = (String) session.getAttribute("usuario");
-    Pedido pedido = (Pedido) request.getAttribute("pedido");
+    int pedido = (int) request.getAttribute("pedido");
 %>
 
 <!DOCTYPE html>
@@ -105,7 +101,7 @@
         <div id="overlay" class="overlay" onclick="closeMenu()"></div>
 
         <div class="contenido">
-            <!-- Dropdown de Acceso Rápido -->
+            <%-- Dropdown de Acceso Rápido --%>
             <div class="dropdown mx-2 ms-auto">
                 <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                     Accesos Rápido
@@ -114,13 +110,13 @@
                     <!-- Formulario para modificar pedido -->
                     <li>
                         <form action="${pageContext.request.contextPath}/Vistas/modificarPedido.jsp" method="post" style="margin: 0;">
-                            <input type="hidden" name="idPedido" value="<%= pedido.getIdentificador()%>">
+                            <input type="hidden" name="idPedido" value="<%= pedido%>">
                             <button type="submit" class="dropdown-item">Modificar Pedido</button>
                         </form>
                     </li>
                     <li>
                         <form action="${pageContext.request.contextPath}/generarInformeProductos" method="post" style="margin: 0;">
-                            <input type="hidden" name="idPedido" value="<%= pedido.getIdentificador()%>">
+                            <input type="hidden" name="idPedido" value="<%= pedido%>">
                             <button type="submit" class="dropdown-item">Generar Informe</button>
                         </form>
                     </li>
@@ -132,38 +128,41 @@
                 <thead class="table-dark">
                     <tr>
                         <th>Producto</th>
-                        <th onclick="ordenarTabla(1)">Nombre <span id="iconoOrden1"></span></th>
-                        <th onclick="ordenarTabla(2)">Descripción <span id="iconoOrden2"></span></th>
-                        <th onclick="ordenarTabla(3)">Cantidad <span id="iconoOrden3"></span></th>
-                        <th onclick="ordenarTabla(4)">Precio Unitario <span id="iconoOrden4"></span></th>
-                        <th onclick="ordenarTabla(5)">Subtotal <span id="iconoOrden5"></span></th>
-                        <th onclick="ordenarTabla(6)">Proveedores <span id="iconoOrden6"></span></th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Subtotal</th>
+                        <th>Proveedores</th>
                     </tr>
                 </thead>
                 <tbody>
                     <%
-                        for (DetallePedido detalle : detallesPagina) {
-                            // Convertimos el byte[] de la imagen a base64
-                            byte[] imagenProducto = detalle.getProducto().getImagen();
-                            String imagenBase64 = "";
-                            if (imagenProducto != null && imagenProducto.length > 0) {
-                                imagenBase64 = Base64.getEncoder().encodeToString(imagenProducto);
-                            }
+                        for (int i = inicio; i < fin; i++) {
+                            JsonObject detalle = detallesArray.get(i).getAsJsonObject();
 
+                            // Datos del producto con verificación
+                            JsonObject producto = detalle.getAsJsonObject("producto");
+                            String nombre = (producto.has("nombre") && !producto.get("nombre").isJsonNull()) ? producto.get("nombre").getAsString() : "N/A";
+                            String descripcion = (producto.has("descripcion") && !producto.get("descripcion").isJsonNull()) ? producto.get("descripcion").getAsString() : "N/A";
+                            double cantidad = (detalle.has("cantidad") && !detalle.get("cantidad").isJsonNull()) ? detalle.get("cantidad").getAsDouble() : 0;
+                            double precioUnitario = (detalle.has("precioVenta") && !detalle.get("precioVenta").isJsonNull()) ? detalle.get("precioVenta").getAsDouble() : 0;
+                            double subtotal = cantidad * precioUnitario;
+
+                            // Procesar imagen si está presente
+                            String imagenBase64 = (producto.has("imagen") && !producto.get("imagen").isJsonNull()) ? producto.get("imagen").getAsString() : "";
+
+                            // Obtener proveedores desde un JsonArray en el detalle, con manejo de tipo adecuado
+                            JsonArray proveedoresArray = (detalle.has("proveedores") && !detalle.get("proveedores").isJsonNull()) ? detalle.getAsJsonArray("proveedores") : new JsonArray();
                             String proveedoresNombres = "";
-                            List<Proveedor> proveedores = detalle.getProveedores();
-                            for (Proveedor proveedor : proveedores) {
-                                proveedoresNombres += proveedor.getNombre() + ", ";
+                            for (int j = 0; j < proveedoresArray.size(); j++) {
+                                JsonObject proveedorObj = proveedoresArray.get(j).getAsJsonObject();
+                                String proveedorNombre = (proveedorObj.has("nombre") && !proveedorObj.get("nombre").isJsonNull()) ? proveedorObj.get("nombre").getAsString() : "Desconocido";
+                                proveedoresNombres += proveedorNombre + ", ";
                             }
-                            // Eliminar la última coma y espacio
                             if (!proveedoresNombres.isEmpty()) {
-                                proveedoresNombres = proveedoresNombres.substring(0, proveedoresNombres.length() - 2);
+                                proveedoresNombres = proveedoresNombres.substring(0, proveedoresNombres.length() - 2); // Eliminar la última coma
                             }
-
-                            // Calcular el subtotal
-                            double cantidad = detalle.getCantidad();
-                            double precioUnitario = detalle.getPrecioVenta();
-                            double subtotal = cantidad * precioUnitario; // Calcular subtotal
                     %>
                     <tr>
                         <td>
@@ -173,19 +172,19 @@
                             <span class="text-muted">No disponible</span>
                             <% }%>
                         </td>
-                        <td><%= detalle.getProducto().getNombre()%></td>
-                        <td><%= detalle.getProducto().getDescripcion()%></td>
+                        <td><%= nombre%></td>
+                        <td><%= descripcion%></td>
                         <td><%= cantidad%></td>
                         <td>$<%= String.format("%.2f", precioUnitario)%></td>
                         <td>$<%= String.format("%.2f", subtotal)%></td>
                         <td><%= proveedoresNombres%></td>
-
                     </tr>
                     <%
                         }
                     %>
                 </tbody>
             </table>
+
 
         </div>
         <!-- Paginación -->

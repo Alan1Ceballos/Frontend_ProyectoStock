@@ -1,10 +1,4 @@
-<%@page import="logica.Fabrica"%>
-<%@page import="logica.Interfaces.IControladorCliente"%>
-<%@page import="logica.Clases.Pedido"%>
-<%@page import="java.util.ArrayList"%>
-<%@page import="java.util.List"%>
 <%@page import="java.text.SimpleDateFormat"%>
-<%@page contentType="text/html;charset=UTF-8" language="java" %>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List" %>
 <%@page import="com.google.gson.JsonArray" %>

@@ -2,7 +2,6 @@ package HistorialPedidosCU;
 
 import Persistencia.ConexionAPI;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -16,20 +15,17 @@ public class VerDetallesPedidoServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
-            //obtenemos el ID del pedido desde la solicitud
+            // obtenemos el ID del pedido desde la solicitud
             int idPedido = Integer.parseInt(request.getParameter("idPedido"));
 
-            //realizamos la llamada al web service para obtener los detalles del pedido
+            // realizamos una única llamada al web service para obtener los detalles del pedido
             JsonArray detalles = ConexionAPI.getRequest("/pedidos/" + idPedido + "/detalles");
 
-            //obtenemos la información básica del pedido
-            JsonObject pedido = ConexionAPI.getRequest("/pedidos/" + idPedido).get(0).getAsJsonObject();
-
-            //almacenamos los datos en el request para la JSP
-            request.setAttribute("pedido", pedido);
+            // almacenamos los datos en el request para la JSP
             request.setAttribute("detalles", detalles);
+            request.setAttribute("pedido", idPedido);
 
-            //redirigimos a la página de detalles del pedido
+            // redirigimos a la página de detalles del pedido
             request.getRequestDispatcher("/Vistas/verDetallesPedido.jsp").forward(request, response);
 
         } catch (NumberFormatException e) {
