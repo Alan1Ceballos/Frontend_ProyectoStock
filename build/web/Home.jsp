@@ -16,7 +16,7 @@
         <title>Página Principal</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="Styles/Home.css">
+        <link rel="stylesheet" type="text/css" href="Styles/home.css">
     </head>
     <body>
         <header class="p-3 bg-dark text-white d-flex justify-content-between align-items-center">

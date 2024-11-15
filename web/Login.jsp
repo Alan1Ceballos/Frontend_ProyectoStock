@@ -18,7 +18,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Inicio de Sesión</title>
-    <link rel="stylesheet" href="Styles/Login.css">
+    <link rel="stylesheet" href="Styles/login.css">
 </head>
 <body>
     <div class="contenedor-login">

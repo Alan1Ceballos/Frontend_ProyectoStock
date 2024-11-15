@@ -1,14 +1,10 @@
-/* 
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/JavaScript.js to edit this template
- */
-
-
 document.addEventListener("DOMContentLoaded", function () {
-    const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
     const carritoContainer = document.getElementById("carritoContainer");
     const carritoTotalElement = document.getElementById("carritoTotal");
     const clienteId = localStorage.getItem("clienteId"); // Recuperar el clienteId de localStorage
+
+    const carrito = JSON.parse(localStorage.getItem(`carrito_${clienteId}`)) || [];
+    console.log("Productos en el carrito:", carrito);
 
     // Agregar un console.log para verificar el clienteId
     console.log("Cliente ID:", clienteId);
@@ -65,7 +61,11 @@ document.addEventListener("DOMContentLoaded", function () {
     // Evento para confirmar el pedido
     document.getElementById("confirmarPedido").addEventListener("click", function () {
         if (carrito.length === 0) {
-            alert("El carrito está vacío. Añada productos antes de confirmar.");
+            Swal.fire({
+                icon: 'warning',
+                title: 'Carrito vacio',
+                text: 'El carrito está vacio. Añada productos antes de confirmar.',
+            });
             return;
         }
 
@@ -76,10 +76,13 @@ document.addEventListener("DOMContentLoaded", function () {
     function confirmarPedido(clienteId, carrito) {
         console.log("Confirmando pedido con Cliente ID:", clienteId); // Agregado para depuración
 
-        
         // Verificar si clienteId es nulo o indefinido
         if (!clienteId) {
-            alert("Cliente ID no está disponible. Por favor, seleccione un cliente.");
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Cliente ID no está disponible. Por favor, seleccione un cliente.',
+            });
             return; // Salir de la función si el clienteId no es válido
         }
 
@@ -94,23 +97,45 @@ document.addEventListener("DOMContentLoaded", function () {
 
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4 && xhr.status === 200) {
-                alert(xhr.responseText); // Muestra el mensaje de confirmación o error
-                // Limpia el carrito en localStorage y actualiza la vista
-                localStorage.removeItem("carrito");
-                mostrarCarrito();
-                window.location.href = "crearPedido"; // Redirige a la página de creación de pedido
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Pedido Confirmado',
+                    text: 'El pedido se agrego correctamente.',
+                }).then(() => {
+                    // Limpia el carrito en localStorage y actualiza la vista
+                    localStorage.removeItem("carrito");
+                    mostrarCarrito();
+                    localStorage.removeItem("carrito_" + clienteId); // Eliminar el carrito con el ID del cliente
+                    localStorage.removeItem("clienteId");
+                    window.location.href = "crearPedido"; // Redirige a la página de creación de pedido
+                });
             }
         };
 
         xhr.send(body); // Enviar la solicitud con el cuerpo
     }
 
-    // Evento para limpiar el carrito
+
+// Evento para limpiar el carrito
     document.getElementById("limpiarCarrito").addEventListener("click", function () {
-        localStorage.removeItem("carrito");
-        carrito.length = 0;  // Vaciar el carrito en memoria
-        mostrarCarrito();
+        Swal.fire({
+            icon: 'warning',
+            title: '¿Seguro que quieres limpiar el carrito?',
+            text: 'Esto eliminará todos los productos del carrito.',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, limpiar',
+            cancelButtonText: 'Cancelar',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Aquí usamos el nombre correcto del carrito con clienteId
+                localStorage.removeItem('clienteId');  // Eliminar carrito de localStorage
+                localStorage.removeItem(`carrito_${clienteId}`);
+                carrito.length = 0;  // Vaciar el carrito en memoria
+                mostrarCarrito();  // Actualizar la vista del carrito
+            }
+        });
     });
+
 
     // Mostrar el carrito al cargar la página
     mostrarCarrito();
