@@ -10,6 +10,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.io.IOException;
+import java.io.InputStream;
+import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 
 public class ConexionAPI {
 
@@ -92,4 +94,76 @@ public class ConexionAPI {
             }
         }
     }
+
+    public static byte[] getPdfRequest(String path) throws Exception {
+        HttpURLConnection conexion = null;
+        try {
+            URL url = new URL(urlBase + path);
+            conexion = (HttpURLConnection) url.openConnection();
+            conexion.setRequestMethod("GET");
+            conexion.setRequestProperty("Content-Type", "application/json");
+
+            int responseCode = conexion.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                // Leemos la respuesta como un flujo de bytes (PDF)
+                try (InputStream inputStream = conexion.getInputStream(); ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+
+                    byte[] buffer = new byte[4096];
+                    int bytesRead;
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        byteArrayOutputStream.write(buffer, 0, bytesRead);
+                    }
+                    return byteArrayOutputStream.toByteArray();
+                }
+            } else {
+                throw new Exception("Error en la solicitud GET: Código de respuesta " + responseCode);
+            }
+        } catch (MalformedURLException e) {
+            throw new Exception("URL mal formada: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new Exception("Error de conexión o lectura de respuesta: " + e.getMessage(), e);
+        } finally {
+            if (conexion != null) {
+                conexion.disconnect(); // Cerramos la conexión
+            }
+        }
+    }
+
+    // Método nuevo: devuelve un String
+    public static String getRequestAsString(String path) throws Exception {
+        HttpURLConnection conexion = null;
+        try {
+            URL url = new URL(urlBase + path);
+            conexion = (HttpURLConnection) url.openConnection();
+            conexion.setRequestMethod("GET");
+            conexion.setRequestProperty("Content-Type", "application/json");
+
+            int responseCode = conexion.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                // Leemos la respuesta
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(conexion.getInputStream()))) {
+                    StringBuilder responseBuilder = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        responseBuilder.append(line);
+                    }
+                    return responseBuilder.toString();  // Regresa como String
+                }
+            } else if (responseCode == HttpURLConnection.HTTP_NO_CONTENT) {
+                // Si no hay contenido, retornar un String vacío
+                return "";
+            } else {
+                throw new Exception("Error en la solicitud GET: Código de respuesta " + responseCode);
+            }
+        } catch (MalformedURLException e) {
+            throw new Exception("URL mal formada: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new Exception("Error de conexión o lectura de respuesta: " + e.getMessage(), e);
+        } finally {
+            if (conexion != null) {
+                conexion.disconnect(); // Cerramos la conexión
+            }
+        }
+    }
+
 }

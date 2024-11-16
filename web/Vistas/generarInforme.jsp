@@ -1,28 +1,6 @@
-<%-- 
-    Document   : generarInforme
-    Created on : 25 oct 2024, 19:32:21
-    Author     : AlanCeballos
---%>
-
-<%@page import="logica.Interfaces.IControladorCategoria"%>
-<%@page import="logica.Interfaces.IControladorCliente"%>
-<%@page import="logica.Fabrica"%>
-<%@page import="java.util.List"%>
-<%@page import="logica.Clases.Cliente"%>
-<%@page import="logica.Clases.Categoria"%>
-<%@page contentType="text/html;charset=UTF-8" language="java" %>
-
-<%
-    //verifica si hay una sesión activa
-    if (session == null || session.getAttribute("usuario") == null) {
-        //redirige a Login.jsp si el usuario no está autenticado
-        response.sendRedirect("Login.jsp");
-        return;
-    }
-    String usuario = (String) session.getAttribute("usuario");
-    IControladorCliente ICC = Fabrica.getInstance().getIControladorCliente();
-    IControladorCategoria ICCat = Fabrica.getInstance().getIControladorCategoria();
-%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="com.google.gson.JsonArray" %>
+<%@ page import="com.google.gson.JsonObject" %>
 
 <!DOCTYPE html>
 <html lang="es">
@@ -34,120 +12,140 @@
     <link rel="stylesheet" type="text/css" href="Styles/generarInforme.css">
 </head>
 <body>
-    <header class="p-3 bg-dark text-white d-flex justify-content-between align-items-center">
-        <button id="openMenuBtn" onclick="openMenu()" class="btn btn-light">☰ Menú</button>
-        <div class="encabezado">
-            <h1 class="mb-1 text-decoration-underline">Generar Informe</h1>
-            <p id="session-info" class="mb-0">
-                Sesión iniciada por: <strong><%= usuario %></strong>
-            </p>
+
+<%-- Verificar si hay sesión activa --%>
+<%
+    if (session == null || session.getAttribute("usuario") == null) {
+        response.sendRedirect("Login.jsp");
+        return;
+    }
+    String usuario = (String) session.getAttribute("usuario");
+%>
+
+<header class="p-3 bg-dark text-white d-flex justify-content-between align-items-center">
+    <button id="openMenuBtn" onclick="openMenu()" class="btn btn-light">☰ Menú</button>
+    <div class="encabezado">
+        <h1 class="mb-1 text-decoration-underline">Generar Informe</h1>
+        <p id="session-info" class="mb-0">Sesión iniciada por: <strong><%= usuario%></strong></p>
+    </div>
+</header>
+
+<!-- Menú lateral -->
+<div id="sidebar" class="sidebar">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeMenu()">☰ Cerrar</a>
+    <a href="Home.jsp"><span class="material-icons">home</span> Inicio</a>
+    <a href="crearPedido"><span class="material-icons">shopping_cart</span> Crear Pedido</a>
+    <a href="historialpedidos"><span class="material-icons">history</span> Historial de Pedidos</a>
+    <a href="clientes"><span class="material-icons">people</span> Listado de Clientes</a>
+    <a href="listadoProductos"><span class="material-icons">inventory</span> Listado de Productos</a>
+    <a href="generarInforme" class="active"><span class="material-icons">insert_chart</span> Generar Informe</a>
+
+    <hr>
+
+    <a href="LogoutServlet"><span class="material-icons">logout</span> Cerrar Sesión</a>
+</div>
+
+<!-- Overlay de oscurecimiento -->
+<div id="overlay" class="overlay" onclick="closeMenu()"></div>
+
+<div class="contenido">
+    <form action="verInforme" method="POST">
+        <div class="mb-4">
+            <h3 class="text-center border-bottom">Seleccione un mes</h3>
+            <div class="col-md-12 mb-3">
+                <select name="mes" id="mes" class="form-select" required>
+                    <option value="">Seleccione un mes</option>
+                    <option value="01">Enero</option>
+                    <option value="02">Febrero</option>
+                    <option value="03">Marzo</option>
+                    <option value="04">Abril</option>
+                    <option value="05">Mayo</option>
+                    <option value="06">Junio</option>
+                    <option value="07">Julio</option>
+                    <option value="08">Agosto</option>
+                    <option value="09">Septiembre</option>
+                    <option value="10">Octubre</option>
+                    <option value="11">Noviembre</option>
+                    <option value="12">Diciembre</option>
+                </select>
+            </div>
         </div>
-    </header>
 
-    <!-- Menú lateral -->
-    <div id="sidebar" class="sidebar">
-        <a href="javascript:void(0)" class="closebtn" onclick="closeMenu()">☰ Cerrar</a>
-        <a href="Home.jsp"><span class="material-icons">home</span> Inicio</a>
-        <a href="crearPedido"><span class="material-icons">shopping_cart</span> Crear Pedido</a>
-        <a href="historialpedidos"><span class="material-icons">history</span> Historial de Pedidos</a>
-        <a href="clientes"><span class="material-icons">people</span> Listado de Clientes</a>
-        <a href="listadoProductos"><span class="material-icons">inventory</span> Listado de Productos</a>
-        <a href="generarInforme" class="active"><span class="material-icons">insert_chart</span> Generar Informe</a>
-        
-        <hr>
-        
-        <a href="LogoutServlet"><span class="material-icons">logout</span> Cerrar Sesión</a>
-    </div>
-
-    <!-- Overlay de oscurecimiento -->
-    <div id="overlay" class="overlay" onclick="closeMenu()"></div>
-    
-    <div class="contenido">
-        <form action="verInforme" method="POST">
-            <div class="mb-4">
-                <h3 class="text-center border-bottom">Seleccione un mes</h3>
-                <div class="col-md-12 mb-3">
-                    <select name="mes" id="mes" class="form-select" required>
-                        <option value="">Seleccione un mes</option>
-                        <option value="01">Enero</option>
-                        <option value="02">Febrero</option>
-                        <option value="03">Marzo</option>
-                        <option value="04">Abril</option>
-                        <option value="05">Mayo</option>
-                        <option value="06">Junio</option>
-                        <option value="07">Julio</option>
-                        <option value="08">Agosto</option>
-                        <option value="09">Septiembre</option>
-                        <option value="10">Octubre</option>
-                        <option value="11">Noviembre</option>
-                        <option value="12">Diciembre</option>
-                    </select>
-                </div>
+        <div class="mb-4">
+            <h3 class="text-center border-bottom">Seleccione el año</h3>
+            <div class="col-md-12">
+                <select name="anio" id="anio" class="form-select" required>
+                    <option value="">Seleccione un año</option>
+                    <%
+                        for (int year = 2000; year <= 2100; year++) {
+                    %>
+                    <option value="<%= year%>"><%= year%></option>
+                    <%
+                        }
+                    %>
+                </select>
             </div>
+        </div>
 
-            <div class="mb-4">
-                <h3 class="text-center border-bottom">Seleccione el año</h3>
-                <div class="col-md-12">
-                    <input type="number" name="anio" id="anio" required min="2000" max="2100" class="form-control">
-                </div>
+        <div class="mb-4">
+            <h3 class="text-center border-bottom">Seleccione un Cliente</h3>
+            <div class="col-md-12 mb-3">
+                <select name="nombreCliente" id="cliente" class="form-select">
+                    <option value="">Seleccione un cliente</option>
+                    <%
+                        JsonArray clientes = (JsonArray) request.getAttribute("clientes");
+                        for (int i = 0; i < clientes.size(); i++) {
+                            JsonObject cliente = clientes.get(i).getAsJsonObject();
+                            String nombre = cliente.get("nom_empresa").getAsString();
+                    %>
+                    <option value="<%= nombre %>"><%= nombre %></option>
+                    <%
+                        }
+                    %>
+                </select>
             </div>
+        </div>
 
-            <div class="mb-4">
-                <h3 class="text-center border-bottom">Seleccione un Cliente</h3>
-                <div class="col-md-12 mb-3">
-                    <select name="nombreCliente" id="cliente" class="form-select">
-                        <option value="">Seleccione un cliente</option>
-                        <%
-                            List<String> clientes = ICC.obtenerNombresClientesActivos();
-                            for (String cliente : clientes) {
-                        %>
-                            <option value="<%= cliente %>"><%= cliente %></option>
-                        <%
-                            }
-                        %>
-                    </select>
-                </div>
+        <div class="mb-4">
+            <h3 class="text-center border-bottom">Seleccione una Categoría</h3>
+            <div class="col-md-12 mb-3">
+                <select name="nombreCategoria" id="categoria" class="form-select">
+                    <option value="">Seleccione una categoría</option>
+                    <%
+                        JsonArray categorias = (JsonArray) request.getAttribute("categorias");
+                        for (int i = 0; i < categorias.size(); i++) {
+                            JsonObject categoria = categorias.get(i).getAsJsonObject();
+                            String nombreCategoria = categoria.get("nombre").getAsString();
+                    %>
+                    <option value="<%= nombreCategoria %>"><%= nombreCategoria %></option>
+                    <%
+                        }
+                    %>
+                </select>
             </div>
+        </div>
 
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Generar Informe</button>
+        </div>
+    </form>
+</div>
 
-            <div class="mb-4">
-                <h3 class="text-center border-bottom">Seleccione una Categoría</h3>
-                <div class="col-md-12 mb-3">
-                    <select name="nombreCategoria" id="categoria" class="form-select">
-                        <option value="">Seleccione una categoría</option>
-                        <%
-                            List<Categoria> categorias = ICCat.listarCategoriasActivas();
-                            for (Categoria categoria : categorias) {
-                        %>
-                            <option value="<%= categoria.getNombre() %>"><%= categoria.getNombre() %></option>
-                        <%
-                            }
-                        %>
-                    </select>
-                </div>
-            </div>
+<footer>
+    <p>&copy; 2024 Programación de Aplicaciones</p>
+</footer>
 
-            <div class="text-center">
-                <button type="submit" class="btn btn-primary">Generar Informe</button> <!-- Botón dentro del formulario -->
-            </div>
-        </form>
-    </div>
+<script>
+    function openMenu() {
+        document.getElementById("sidebar").style.width = "250px";
+        document.getElementById("overlay").style.display = "block";
+    }
+    function closeMenu() {
+        document.getElementById("sidebar").style.width = "0";
+        document.getElementById("overlay").style.display = "none";
+    }
+</script>
 
-    <footer>
-        <p>&copy; 2024 Programación de Aplicaciones</p>
-    </footer>
-
-    <script>
-        function openMenu() {
-            document.getElementById("sidebar").style.width = "250px";
-            document.getElementById("overlay").style.display = "block";
-        }
-        function closeMenu() {
-            document.getElementById("sidebar").style.width = "0";
-            document.getElementById("overlay").style.display = "none";
-        }
-    </script>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

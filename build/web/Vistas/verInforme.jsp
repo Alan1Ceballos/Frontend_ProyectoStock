@@ -1,26 +1,20 @@
-<%-- 
-    Document   : verInforme
-    Created on : 25 oct 2024, 19:33:50
-    Author     : AlanCeballos
---%>
+<%@page import="com.google.gson.JsonElement"%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="com.google.gson.JsonArray" %>
+<%@ page import="com.google.gson.JsonObject" %>
+<%@ page import="org.apache.commons.lang3.StringUtils" %>
 
-<%@page import="logica.Interfaces.IControladorCliente"%>
-<%@page import="logica.Fabrica"%>
-<%@page import="logica.Clases.DetallePedido"%>
-<%@page import="java.util.List"%>
-<%@page import="logica.Clases.Pedido"%>
-<%@page import="java.util.ArrayList"%>
-<%@page contentType="text/html;charset=UTF-8" language="java" %>
 <%
-    //verifica si hay una sesión activa
+    // Verifica si hay una sesión activa
     if (session == null || session.getAttribute("usuario") == null) {
-        //redirige a Login.jsp si el usuario no está autenticado
         response.sendRedirect("Login.jsp");
         return;
     }
     String usuario = (String) session.getAttribute("usuario");
-    
-    IControladorCliente ICC = Fabrica.getInstance().getIControladorCliente();
+
+    // Obtener los datos enviados desde el servlet
+    JsonArray pedidosJson = (JsonArray) request.getAttribute("pedidos");
+    JsonArray detallesJson = (JsonArray) request.getAttribute("detalles");
 %>
 
 <!DOCTYPE html>
@@ -37,29 +31,14 @@
             <button id="openMenuBtn" onclick="openMenu()" class="btn btn-light">☰ Menú</button>
             <div class="encabezado">
                 <h1 class="mb-1 text-decoration-underline">Informe de Pedidos</h1>
-                <p id="session-info" class="mb-0">
-                    Sesión iniciada por: <strong><%= usuario%></strong>
-                </p>
+                <p id="session-info" class="mb-0">Sesión iniciada por: <strong><%= usuario%></strong></p>
             </div>
         </header>
 
         <!-- Menú lateral -->
         <div id="sidebar" class="sidebar">
-            <a href="javascript:void(0)" class="closebtn" onclick="closeMenu()">☰ Cerrar</a>
-            <a href="Home.jsp"><span class="material-icons">home</span> Inicio</a>
-            <a href="crearPedido"><span class="material-icons">shopping_cart</span> Crear Pedido</a>
-            <a href="historialpedidos"><span class="material-icons">history</span> Historial de Pedidos</a>
-            <a href="clientes"><span class="material-icons">people</span> Listado de Clientes</a>
-            <a href="listadoProductos"><span class="material-icons">inventory</span> Listado de Productos</a>
-            <a href="generarInforme"><span class="material-icons">insert_chart</span> Generar Informe</a>
-
-            <hr>
-
-            <a href="LogoutServlet"><span class="material-icons">logout</span> Cerrar Sesión</a>
+            <!-- Menú -->
         </div>
-
-        <!-- Overlay de oscurecimiento -->
-        <div id="overlay" class="overlay" onclick="closeMenu()"></div>
 
         <div class="contenido">
             <!-- Tabla de Pedidos -->
@@ -79,38 +58,34 @@
                 </thead>
                 <tbody>
                     <%
-                        ArrayList<Pedido> pedidos = (ArrayList<Pedido>) request.getAttribute("pedidos");
-                        if (pedidos != null && !pedidos.isEmpty()) {
-                            for (Pedido pedido : pedidos) {
-                                String estadoPedido;
-                                switch (pedido.getEstado()) {
-                                    case EN_PREPARACION:
-                                        estadoPedido = "En Preparación";
-                                        break;
-                                    case EN_VIAJE:
-                                        estadoPedido = "En Viaje";
-                                        break;
-                                    case ENTREGADO:
-                                        estadoPedido = "Entregado";
-                                        break;
-                                    case CANCELADO:
-                                        estadoPedido = "Cancelado";
-                                        break;
-                                    default:
-                                        estadoPedido = "Estado Desconocido";
-                                        break;
-                                }
+                        if (pedidosJson != null && pedidosJson.size() > 0) {
+                            for (int i = 0; i < pedidosJson.size(); i++) {
+                                JsonObject pedido = pedidosJson.get(i).getAsJsonObject();
+                                String estadoPedido = pedido.has("estado") && !pedido.get("estado").isJsonNull()
+                                        ? pedido.get("estado").getAsString()
+                                        : "Desconocido";
+                                String nombreCliente = pedido.has("nombreCliente") && !pedido.get("nombreCliente").isJsonNull()
+                                        ? pedido.get("nombreCliente").getAsString()
+                                        : "Desconocido";
+                                double total = pedido.has("total") && !pedido.get("total").isJsonNull()
+                                        ? pedido.get("total").getAsDouble()
+                                        : 0.0;
+                                String fechaPedido = pedido.has("fechaPedido") && !pedido.get("fechaPedido").isJsonNull()
+                                        ? pedido.get("fechaPedido").getAsString()
+                                        : "Desconocida";
 
-                                String nombreCliente = ICC.getNombreClientePorId(pedido.getIdCliente());
+                                // Capitalizar la fecha
+                                String fechaCapitalizada = StringUtils.capitalize(fechaPedido.toLowerCase());
+                                // Ajustar el estado para mostrarlo correctamente
+                                String estadoMostrar = estadoPedido.equalsIgnoreCase("ENTREGADO") ? "Entregado" : estadoPedido;
                     %>
                     <tr>
-                        <td><%= pedido.getIdentificador()%></td>
-                        <td><%= pedido.getFechaPedido()%></td>
-                        <td><%= estadoPedido%></td>
-                        <td>$<%= String.format("%.2f", pedido.getTotal())%></td>
-                        <td><%= nombreCliente != null ? nombreCliente : "Desconocido"%></td>
+                        <td><%= pedido.has("identificador") ? pedido.get("identificador").getAsString() : "Desconocido"%></td>
+                        <td><%= fechaCapitalizada%></td>
+                        <td><%= estadoMostrar%></td>
+                        <td>$<%= String.format("%.2f", total)%></td>
+                        <td><%= nombreCliente%></td>
                     </tr>
-
                     <%
                         }
                     } else {
@@ -142,23 +117,64 @@
                 </thead>
                 <tbody>
                     <%
-                        List<DetallePedido> detalles = (List<DetallePedido>) request.getAttribute("detalles");
                         double totalIngresos = 0.0;
+                        if (detallesJson != null && detallesJson.size() > 0) {
+                            for (int i = 0; i < detallesJson.size(); i++) {
+                                JsonObject detalle = detallesJson.get(i).getAsJsonObject();
 
-                        if (detalles != null && !detalles.isEmpty()) {
-                            for (DetallePedido detalle : detalles) {
-                                double subtotal = detalle.getCantidad() * detalle.getPrecioVenta(); // Calcular subtotal
-                                totalIngresos += subtotal; // Sumar al total de ingresos
-%>
+                                // Manejo seguro del campo "producto" y dentro de él "id", "nombre" y "descripcion"
+                                String idProducto = "Desconocido";
+                                String nombreProducto = "Desconocido";
+                                String descripcion = "Sin descripción";
+
+                                if (detalle.has("producto") && !detalle.get("producto").isJsonNull()) {
+                                    JsonObject producto = detalle.getAsJsonObject("producto");
+
+                                    // Manejo seguro del campo "id" dentro de "producto"
+                                    if (producto.has("id") && !producto.get("id").isJsonNull()) {
+                                        idProducto = producto.get("id").getAsString();
+                                    }
+
+                                    // Manejo seguro del campo "nombre" dentro de "producto"
+                                    if (producto.has("nombre") && !producto.get("nombre").isJsonNull()) {
+                                        nombreProducto = producto.get("nombre").getAsString();
+                                    }
+
+                                    // Manejo seguro del campo "descripcion" dentro de "producto"
+                                    if (producto.has("descripcion") && !producto.get("descripcion").isJsonNull()) {
+                                        descripcion = producto.get("descripcion").getAsString();
+                                    }
+                                }
+
+                                // Manejo seguro del campo "cantidad"
+                                double cantidad = 0.0;
+                                if (detalle.has("cantidad") && !detalle.get("cantidad").isJsonNull()) {
+                                    JsonElement cantidadElement = detalle.get("cantidad");
+                                    if (cantidadElement.isJsonPrimitive()) {
+                                        cantidad = cantidadElement.getAsDouble();
+                                    }
+                                }
+
+                                // Manejo seguro del campo "precio"
+                                double precio = 0.0;
+                                if (detalle.has("precioVenta") && !detalle.get("precioVenta").isJsonNull()) {
+                                    JsonElement precioElement = detalle.get("precioVenta");
+                                    if (precioElement.isJsonPrimitive()) {
+                                        precio = precioElement.getAsDouble();
+                                    }
+                                }
+
+                                double subtotal = cantidad * precio;
+                                totalIngresos += subtotal;
+                    %>
                     <tr>
-                        <td><%= detalle.getProducto().getId()%></td>
-                        <td><%= detalle.getProducto().getNombre()%></td>
-                        <td><%= detalle.getProducto().getDescripcion()%></td>
-                        <td><%= detalle.getCantidad()%></td>
-                        <td>$<%= String.format("%.2f", detalle.getPrecioVenta())%></td>
-                        <td>$<%= String.format("%.2f", detalle.getCantidad() * detalle.getPrecioVenta())%></td> 
+                        <td><%= idProducto%></td>
+                        <td><%= nombreProducto%></td>
+                        <td><%= descripcion%></td>
+                        <td><%= cantidad%></td>
+                        <td>$<%= String.format("%.2f", precio)%></td>
+                        <td>$<%= String.format("%.2f", subtotal)%></td>
                     </tr>
-
                     <%
                         }
                     } else {
@@ -170,6 +186,7 @@
                         }
                     %>
                 </tbody>
+
             </table>
 
             <!-- Total Ingresos -->
@@ -180,8 +197,11 @@
             <!-- Botón para Descargar PDF -->
             <div class="descargar-pdf-container text-end mt-4">
                 <a href="<%= request.getContextPath()%>/descargarPDF?mes=<%= request.getParameter("mes")%>&anio=<%= request.getParameter("anio")%>&nombreCliente=<%= request.getParameter("nombreCliente")%>&nombreCategoria=<%= request.getParameter("nombreCategoria")%>" 
-                   class="btn btn-descargar-pdf">Descargar PDF</a>
+                   class="btn btn-primary btn-lg shadow-sm text-center">
+                    <i class="fas fa-file-pdf me-2"></i> Descargar PDF
+                </a>
             </div>
+
         </div>
 
         <footer class="text-center mt-4" style="background-color: #212529; color: white; padding: 10px 0;">

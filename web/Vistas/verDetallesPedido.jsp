@@ -115,10 +115,11 @@
                         </form>
                     </li>
                     <li>
-                        <form action="${pageContext.request.contextPath}/generarInformeProductos" method="post" style="margin: 0;">
+                        <form action="${pageContext.request.contextPath}/generarBoleta" method="get" style="margin: 0;">
                             <input type="hidden" name="idPedido" value="<%= pedido%>">
                             <button type="submit" class="dropdown-item">Generar Informe</button>
                         </form>
+
                     </li>
                 </ul>
             </div>
@@ -208,7 +209,7 @@
                 for (int i = inicioPaginas; i <= finPaginas; i++) {
                     // Verifica si el botón es el de la página actual
                     String activeClass = (i == paginaActual) ? "btn-primary" : "btn-outline-secondary"; // Cambiar la clase del botón
-            %>
+%>
             <a href="verdetalles?idPedido=<%= idPedido%>&page=<%= i%>" class="btn <%= activeClass%> btn-sm mx-1"><%= i%></a>
             <%
                 }

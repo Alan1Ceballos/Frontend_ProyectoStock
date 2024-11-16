@@ -76,6 +76,18 @@
             </div>
         </header>
 
+        <%-- Mostrar mensaje de éxito o error --%>
+        <%
+            String mensaje = (String) request.getAttribute("mensaje");
+            if (mensaje != null && !mensaje.isEmpty()) {
+        %>
+        <div class="alert alert-info" role="alert">
+            <%= mensaje%>
+        </div>
+        <%
+            }
+        %>
+
 
         <!-- Menú lateral -->
         <div id="sidebar" class="sidebar">
@@ -130,7 +142,7 @@
                                         estadoPedido = "Estado Desconocido"; // por si hay un estado no esperado
                                         break;
                                 }
-                                
+
                                 //obtenemos el nombre del cliente desde el JSON
                                 String nombreCliente = pedidoJson.has("nombreCliente") ? pedidoJson.get("nombreCliente").getAsString() : "Desconocido";
                     %>
@@ -138,7 +150,7 @@
                         <td><%= dateFormat.format(new java.util.Date(pedidoJson.get("fechaPedido").getAsLong()))%></td>
                         <td class="estadoPedido" data-estado="<%= estadoPedido%>"><%= estadoPedido%></td>
                         <td>$<%= String.format("%.2f", pedidoJson.get("total").getAsDouble())%></td>
-                        <td><%= nombreCliente %></td>
+                        <td><%= nombreCliente%></td>
                         <td>
                             <form action="${pageContext.request.contextPath}/verdetalles" method="get" style="display:inline;">
                                 <input type="hidden" name="idPedido" value="<%= pedidoJson.get("identificador").getAsInt()%>">
@@ -171,8 +183,7 @@
 
         <script>
             function confirmarCancelacion() {
-                var idPedido = document.querySelector(".idPedido").value;
-                // Usar el ID en la alerta de confirmación
+                var idPedido = document.querySelector("input[name='idPedido']").value; // Obtener el ID del formulario
                 return confirm("¿Estás seguro de que deseas cancelar el pedido con ID: " + idPedido + "?");
             }
         </script>
