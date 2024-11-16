@@ -1,9 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 
+import com.google.gson.JsonObject;
+import Persistencia.ConexionAPI;
 import java.io.IOException;
+import java.net.URLEncoder;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -11,14 +10,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import logica.Fabrica;
-import logica.Interfaces.IControladorVendedor;
-
 @WebServlet(urlPatterns = {"/login"})
 public class LoginServlet extends HttpServlet {
-    
-    private IControladorVendedor ICV = Fabrica.getInstance().getIControladorVendedor();
-    
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -33,34 +27,39 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
 
         try {
-            // Validamos las credenciales del usuario
-            if (validateUsuario(userName, password)) {
-                // Obtenemos el ID del vendedor a través del controlador
-                Integer idVendedor = this.ICV.obtenerIdPorUsuario(userName);
+            // Crear el cuerpo del formulario URL codificado
+            StringBuilder postData = new StringBuilder();
+            postData.append("usuario=").append(URLEncoder.encode(userName, "UTF-8"));
+            postData.append("&password=").append(URLEncoder.encode(password, "UTF-8"));
+
+            // Hacer la solicitud POST a la API de login
+            JsonObject apiResponse = ConexionAPI.postRequestForm("/login/", postData.toString());
+
+            // Verificamos si la respuesta es exitosa (código 200)
+            if (apiResponse != null && apiResponse.has("id")) {
+                // Si el login es exitoso, obtenemos el ID y nombre del vendedor
+                Integer idVendedor = apiResponse.get("id").getAsInt();
+                String nombre = apiResponse.get("nombre").getAsString();
 
                 // Creamos la sesión y guardamos el usuario y el idVendedor
                 HttpSession session = request.getSession();
                 session.setAttribute("usuario", userName);
-                session.setAttribute("idVendedor", idVendedor);  // Guardamos el ID del vendedor en la sesión
-                
+                session.setAttribute("idVendedor", idVendedor);
+                session.setAttribute("nombre", nombre);  // Guardamos el nombre también en la sesión
+
                 // Redirigimos al Home.jsp
                 response.sendRedirect("Home.jsp");
             } else {
-                // Usuario o contraseña incorrectos
+                // Si la respuesta no tiene el ID, fue un fallo en el login
                 request.setAttribute("errorMessage", "Usuario o contraseña incorrectos.");
                 request.getRequestDispatcher("Login.jsp").forward(request, response);
             }
+
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "Usuario o contraseña incorrectos.");
+            request.setAttribute("errorMessage", "Hubo un error al procesar el login.");
             request.getRequestDispatcher("Login.jsp").forward(request, response);
         }
-    }
-
-    // Método para validar las credenciales del usuario
-    private boolean validateUsuario(String username, String password) {
-        // Validamos las credenciales con la contraseña encriptada
-        return this.ICV.validarCredenciales(username, password);
     }
 
     @Override

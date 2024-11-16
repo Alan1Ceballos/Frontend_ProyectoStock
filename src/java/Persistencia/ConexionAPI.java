@@ -12,6 +12,7 @@ import java.net.URL;
 import java.io.IOException;
 import java.io.InputStream;
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
+import org.json.JSONObject;
 
 public class ConexionAPI {
 
@@ -54,6 +55,92 @@ public class ConexionAPI {
         } finally {
             if (conexion != null) {
                 conexion.disconnect(); //cerramos la conexión
+            }
+        }
+    }
+
+    public static JsonObject postRequestForm(String path, String formData) throws Exception {
+        HttpURLConnection conexion = null;
+        try {
+            URL url = new URL(urlBase + path);
+            conexion = (HttpURLConnection) url.openConnection();
+            conexion.setRequestMethod("POST");
+            conexion.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            conexion.setDoOutput(true);
+
+            // Enviamos el cuerpo de la solicitud con los datos codificados en URL
+            try (OutputStream os = conexion.getOutputStream()) {
+                os.write(formData.getBytes());
+                os.flush();
+            }
+
+            int responseCode = conexion.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                // Leemos la respuesta
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(conexion.getInputStream()))) {
+                    StringBuilder responseBuilder = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        responseBuilder.append(line);
+                    }
+                    return JsonParser.parseString(responseBuilder.toString()).getAsJsonObject();
+                }
+            } else {
+                throw new Exception("Error en la solicitud POST: Código de respuesta " + responseCode);
+            }
+        } catch (MalformedURLException e) {
+            throw new Exception("URL mal formada: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new Exception("Error de conexión o lectura de respuesta: " + e.getMessage(), e);
+        } finally {
+            if (conexion != null) {
+                conexion.disconnect(); // Cerramos la conexión
+            }
+        }
+    }
+    
+    // Método para realizar solicitudes POST
+    public static JsonObject postRequestCarrito(String path, JSONObject jsonBody) throws Exception {
+        HttpURLConnection conexion = null;
+        try {
+            // Construir la URL completa
+            URL url = new URL(urlBase + path);
+            conexion = (HttpURLConnection) url.openConnection();
+            conexion.setRequestMethod("POST");
+            conexion.setRequestProperty("Content-Type", "application/json");
+            conexion.setDoOutput(true);  // Indicar que vamos a enviar datos en el cuerpo de la solicitud
+
+            // Enviar el cuerpo de la solicitud
+            try (OutputStream os = conexion.getOutputStream()) {
+                byte[] input = jsonBody.toString().getBytes("utf-8");  // Convertir el JSON a bytes en UTF-8
+                os.write(input, 0, input.length);  // Escribir los bytes en el flujo de salida
+                os.flush();  // Asegurarse de que los datos se envíen
+            }
+
+            // Obtener el código de respuesta
+            int responseCode = conexion.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                // Leer la respuesta de la API
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(conexion.getInputStream()))) {
+                    StringBuilder responseBuilder = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        responseBuilder.append(line);  // Acumular la respuesta
+                    }
+                    // Parsear la respuesta como un objeto JSON y devolverlo
+                    return JsonParser.parseString(responseBuilder.toString()).getAsJsonObject();
+                }
+            } else {
+                // Si la respuesta no es 200 OK, lanzar una excepción con el código de error
+                throw new Exception("Error en la solicitud POST: Código de respuesta " + responseCode);
+            }
+        } catch (MalformedURLException e) {
+            throw new Exception("URL mal formada: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new Exception("Error de conexión o lectura de respuesta: " + e.getMessage(), e);
+        } finally {
+            if (conexion != null) {
+                conexion.disconnect(); // Cerrar la conexión para liberar recursos
             }
         }
     }

@@ -1,7 +1,6 @@
-<%@page import="logica.Clases.Categoria"%>
+<%@page import="com.google.gson.JsonObject"%>
+<%@page import="com.google.gson.JsonArray"%>
 <%@page import="java.util.ArrayList"%>
-<%@page import="logica.Clases.Cliente"%>
-<%@page import="logica.Clases.Producto"%>
 <%@page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%
@@ -12,6 +11,9 @@
         return;
     }
     String usuario = (String) session.getAttribute("usuario");
+    JsonArray clientes = (JsonArray) request.getAttribute("clientes");
+    JsonArray productos = (JsonArray) request.getAttribute("productos");
+    JsonArray categorias = (JsonArray) request.getAttribute("categorias");
 %>
 
 
@@ -78,34 +80,37 @@
                 <div class="mb-3">
                     <label for="cliente" class="form-label">Seleccione Cliente:</label>
                     <select name="cliente" id="cliente" class="form-select">
-                        <option value="" disabled selected>Seleccione un cliente</option> <!-- Opción por defecto -->
+                        <option value="" disabled selected>Seleccionar un cliente</option>
                         <%
-                            ArrayList<Cliente> clientes = (ArrayList<Cliente>) request.getAttribute("clientes");
-                            ArrayList<Integer> idsClientes = (ArrayList<Integer>) request.getAttribute("idsClientes");
-                            if (clientes != null && idsClientes != null) {
+                            if (clientes != null) {
                                 for (int i = 0; i < clientes.size(); i++) {
-                                    Cliente cliente = clientes.get(i);
-                                    int clienteId = idsClientes.get(i);
+                                    JsonObject cliente = clientes.get(i).getAsJsonObject();
+                                    String id = cliente.get("identificador").getAsString();
+                                    String nombre = cliente.get("nom_empresa").getAsString();
+                                    String email = cliente.get("correo_electronico").getAsString();
                         %>
-                        <option value="<%= clienteId%>"><%= cliente.getIdentificador()%> - <%= cliente.getNom_empresa()%> - <%= cliente.getCorreo_electronico()%></option>
+                        <option value="<%= id%>"><%= nombre%> - <%= email%></option>
                         <%
                                 }
                             }
                         %>
                     </select>
                 </div>
+
 
                 <!-- Selección de Categoría -->
                 <div class="form-group mb-3">
                     <label for="selectCategoria">Selecciona una Categoría:</label>
                     <select id="selectCategoria" name="categoriaSeleccionada" class="form-control" onchange="cargarProductos(this.value)">
-                        <option value="">Categorías</option>
+                        <option value="">Seleccionar una categoria</option>
                         <%
-                            ArrayList<Categoria> categorias = (ArrayList<Categoria>) request.getAttribute("categorias");
                             if (categorias != null) {
-                                for (Categoria categoria : categorias) {
+                                for (int i = 0; i < categorias.size(); i++) {
+                                    JsonObject categoria = categorias.get(i).getAsJsonObject();
+                                    String categoriaId = categoria.get("id").getAsString();
+                                    String categoriaNombre = categoria.get("nombre").getAsString();
                         %>
-                        <option value="<%= categoria.getId()%>"><%= categoria.getNombre()%></option>
+                        <option value="<%= categoriaId%>"><%= categoriaNombre%></option>
                         <%
                                 }
                             }
@@ -113,26 +118,32 @@
                     </select>
                 </div>
 
+
                 <!-- Selección de Producto -->
                 <div class="form-group mb-3">
                     <label for="selectProducto">Selecciona un Producto:</label>
                     <select id="selectProducto" class="form-control" name="idProducto">
-                        <option value="">Productos</option>
+                        <option value="">Seleccionar un producto</option>
                         <%
-                            ArrayList<Producto> productos = (ArrayList<Producto>) request.getAttribute("productos");
                             if (productos != null) {
-                                for (Producto producto : productos) {
+                                for (int i = 0; i < productos.size(); i++) {
+                                    JsonObject producto = productos.get(i).getAsJsonObject();
+                                    String productoId = producto.get("id").getAsString();
+                                    String nombreProducto = producto.get("nombre").getAsString();
+                                    String precio = producto.get("precioVenta").getAsString();
+                                    String categoriaId = producto.getAsJsonObject("categoria").get("id").getAsString();
                         %>
-                        <option value="<%= producto.getId()%>" data-precio="<%= producto.getPrecioVenta()%>" data-categoria="<%= producto.getCategoria().getId()%>">
-                            <%= producto.getNombre()%>
+                        <option value="<%= productoId%>" data-precio="<%= precio%>" data-categoria="<%= categoriaId%>">
+                            <%= nombreProducto%>
                         </option>
                         <%
                                 }
                             }
                         %>
                     </select>
-
                 </div>
+
+
 
                 <!-- Selección de Cantidad -->
                 <div class="form-group mb-3">

@@ -5,20 +5,16 @@ package CrearPedidoCU;
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 
+import Persistencia.ConexionAPI;
+import com.google.gson.JsonObject;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import logica.Clases.DetallePedido;
-import logica.Clases.Pedido;
-import logica.Clases.Producto;
-import logica.Fabrica;
-import logica.Interfaces.IControladorPedido;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -29,16 +25,14 @@ import org.json.JSONObject;
 @WebServlet(urlPatterns = {"/verCarrito"})
 public class verCarritoServlet extends HttpServlet {
 
-    IControladorPedido controladorPedido = Fabrica.getInstance().getIControladorPedido();
-
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
 
-        // Obtener el carrito de la sesión
-        ArrayList<DetallePedido> carrito = (ArrayList<DetallePedido>) session.getAttribute("carrito");
+        // Obtener el carrito de la sesión (como JSON)
+        JSONArray carrito = (JSONArray) session.getAttribute("carrito");
         if (carrito == null) {
-            carrito = new ArrayList<>();
+            carrito = new JSONArray();
             session.setAttribute("carrito", carrito);
         }
 
@@ -47,11 +41,12 @@ public class verCarritoServlet extends HttpServlet {
         if (eliminarIndexStr != null) {
             try {
                 int eliminarIndex = Integer.parseInt(eliminarIndexStr);
-                if (eliminarIndex >= 0 && eliminarIndex < carrito.size()) {
+                if (eliminarIndex >= 0 && eliminarIndex < carrito.length()) {
                     carrito.remove(eliminarIndex); // Eliminar el producto del carrito
                 }
             } catch (NumberFormatException e) {
-                // Manejar el caso de que el índice no sea un número válido
+                response.getWriter().write("Índice de eliminación inválido.");
+                return;
             }
         }
 
@@ -62,8 +57,8 @@ public class verCarritoServlet extends HttpServlet {
             return;
         }
 
-        // Pasar el carrito a la vista JSP
-        request.setAttribute("carrito", carrito);
+        // Pasar el carrito a la vista JSP como JSON
+        request.setAttribute("carrito", carrito.toString());
         request.getRequestDispatcher("Vistas/verCarrito.jsp").forward(request, response);
     }
 
@@ -77,43 +72,35 @@ public class verCarritoServlet extends HttpServlet {
                 jsonBuffer.append(line);
             }
 
+            // Procesar el cuerpo JSON de la solicitud
             JSONObject jsonObject = new JSONObject(jsonBuffer.toString());
-            int idCliente = jsonObject.getInt("clienteId");
+            String clienteId = jsonObject.getString("clienteId");
             JSONArray carritoArray = jsonObject.getJSONArray("carrito");
 
             if (carritoArray.length() == 0) {
                 response.getWriter().write("El carrito está vacío. Añade productos antes de confirmar.");
                 return;
             }
-            
-            int idVendedor = (int) session.getAttribute("idVendedor");
 
-            Pedido nuevoPedido = new Pedido();
-            nuevoPedido.setFechaPedido(new java.util.Date());
-            nuevoPedido.setEstado(Pedido.Estado.EN_PREPARACION);
-            nuevoPedido.setIdVendedor(idVendedor);
-            nuevoPedido.setIdCliente(idCliente);
+            // Crear el objeto JSON para el cuerpo de la solicitud POST
+            JSONObject jsonPedido = new JSONObject();
+            jsonPedido.put("clienteId", clienteId);
+            jsonPedido.put("carrito", carritoArray);
 
-            for (int i = 0; i < carritoArray.length(); i++) {
-                JSONObject detalleObj = carritoArray.getJSONObject(i);
-                Producto producto = new Producto();
-                producto.setId(detalleObj.getInt("id"));
+            // Hacer la solicitud POST al API REST
+            JsonObject result = ConexionAPI.postRequestCarrito("/carrito/confirmarPedido", jsonPedido);
 
-                DetallePedido detalle = new DetallePedido();
-                detalle.setProducto(producto);
-                detalle.setCantidad(detalleObj.getInt("quantity"));
-                detalle.setPrecioVenta((float) detalleObj.getDouble("price"));
-
-                nuevoPedido.agregarDetalle(detalle);
-            }
-
-            boolean resultado = this.controladorPedido.agregarPedido(nuevoPedido);
-            if (resultado) {
-                response.getWriter().write("Pedido añadido exitosamente.");
-                session.removeAttribute("carrito");
+            // Procesar la respuesta del API
+            if (result != null && result.has("message")) {
+                String mensaje = result.get("message").getAsString();
+                response.getWriter().write(mensaje);
+                if (mensaje.equals("Pedido añadido exitosamente.")) {
+                    session.removeAttribute("carrito"); // Limpiar el carrito
+                }
             } else {
-                response.getWriter().write("Error al añadir el pedido. Inténtelo de nuevo.");
+                response.getWriter().write("Error al confirmar el pedido.");
             }
+
         } catch (Exception e) {
             e.printStackTrace();
             response.getWriter().write("Ocurrió un error al confirmar el pedido: " + e.getMessage());
@@ -134,6 +121,6 @@ public class verCarritoServlet extends HttpServlet {
 
     @Override
     public String getServletInfo() {
-        return "Short description";
+        return "Servlet para gestionar el carrito de compras y la confirmación de pedidos";
     }
 }

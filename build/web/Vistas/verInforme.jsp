@@ -37,9 +37,22 @@
 
         <!-- Menú lateral -->
         <div id="sidebar" class="sidebar">
-            <!-- Menú -->
+            <a href="javascript:void(0)" class="closebtn" onclick="closeMenu()">☰ Cerrar</a>
+            <a href="Home.jsp"><span class="material-icons">home</span> Inicio</a>
+            <a href="crearPedido"><span class="material-icons">shopping_cart</span> Crear Pedido</a>
+            <a href="historialpedidos"><span class="material-icons">history</span> Historial de Pedidos</a>
+            <a href="clientes"><span class="material-icons">people</span> Listado de Clientes</a>
+            <a href="listadoProductos"><span class="material-icons">inventory</span> Listado de Productos</a>
+            <a href="generarInforme"><span class="material-icons">insert_chart</span> Generar Informe</a>
+
+            <hr>
+
+            <a href="LogoutServlet"><span class="material-icons">logout</span> Cerrar Sesión</a>
         </div>
 
+        <!-- Overlay de oscurecimiento -->
+        <div id="overlay" class="overlay" onclick="closeMenu()"></div>
+        
         <div class="contenido">
             <!-- Tabla de Pedidos -->
             <div class="text-center mt-4 p-3 border border-dark rounded" style="background-color: #f8f9fa;">
