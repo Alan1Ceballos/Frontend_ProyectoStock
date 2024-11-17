@@ -1,9 +1,3 @@
-/* 
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/JavaScript.js to edit this template
- */
-
-
 document.addEventListener("DOMContentLoaded", function () {
     const carritoContainer = document.getElementById("carritoContainer");
     const carritoTotalElement = document.getElementById("carritoTotal");
@@ -80,7 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Definición de la función confirmarPedido
     function confirmarPedido(clienteId, carrito) {
-        console.log("Confirmando pedido con Cliente ID:", clienteId);
+        console.log("Confirmando pedido con Cliente ID:", clienteId); // Agregado para depuración
 
         // Verificar si clienteId es nulo o indefinido
         if (!clienteId) {
@@ -93,49 +87,33 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         const xhr = new XMLHttpRequest();
-        xhr.open("POST", "/carrito/confirmarPedido", true);
+        xhr.open("POST", "verCarrito?confirmarPedido=true", true);
 
         // Cambiar el tipo de contenido a JSON
         xhr.setRequestHeader("Content-Type", "application/json");
 
-        // Crear el cuerpo de la solicitud
-        const body = JSON.stringify({
-            clienteId: clienteId,
-            carrito: carrito
-        });
+        // Prepara el cuerpo de la solicitud
+        const body = JSON.stringify({clienteId: clienteId, carrito: carrito});
 
-        // Enviar la solicitud
-        xhr.send(body);
-
-        // Manejar la respuesta
         xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4) { // La solicitud ha terminado
-                if (xhr.status === 200) { // Éxito
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Pedido confirmado',
-                        text: 'Tu pedido ha sido confirmado exitosamente.',
-                    });
-                } else { // Error en la solicitud
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error al confirmar el pedido',
-                        text: 'Hubo un problema al confirmar tu pedido. Intenta nuevamente.',
-                    });
-                }
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Pedido Confirmado',
+                    text: 'El pedido se agrego correctamente.',
+                }).then(() => {
+                    // Limpia el carrito en localStorage y actualiza la vista
+                    localStorage.removeItem("carrito");
+                    mostrarCarrito();
+                    localStorage.removeItem("carrito_" + clienteId); // Eliminar el carrito con el ID del cliente
+                    localStorage.removeItem("clienteId");
+                    window.location.href = "crearPedido"; // Redirige a la página de creación de pedido
+                });
             }
         };
 
-        // Manejar posibles errores de red
-        xhr.onerror = function () {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Hubo un error en la conexión. Por favor, intenta nuevamente.',
-            });
-        };
+        xhr.send(body); // Enviar la solicitud con el cuerpo
     }
-
 
 
 // Evento para limpiar el carrito
