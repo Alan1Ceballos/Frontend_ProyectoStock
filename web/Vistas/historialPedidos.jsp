@@ -108,6 +108,21 @@
         <div id="overlay" class="overlay" onclick="closeMenu()"></div>
 
         <div class="contenido">
+
+            <%-- Dropdown de Acceso Rápido --%>
+            <div class="dropdown mx-2 ms-auto">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                    Accesos Rápido
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                    <li>
+                        <form action="${pageContext.request.contextPath}/crearPedido" method="get" style="margin: 0;">
+                            <button type="submit" class="dropdown-item">Nuevo Pedido</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+
             <table id="tablaPedidos" class="table table-striped table-hover table-bordered mx-auto">
                 <thead class="table-dark">
                     <tr>
@@ -156,10 +171,11 @@
                                 <input type="hidden" name="idPedido" value="<%= pedidoJson.get("identificador").getAsInt()%>">
                                 <button type="submit" class="btn btn-primary">Ver Detalles</button>
                             </form>
-                            <form action="${pageContext.request.contextPath}/Vistas/modificarPedido.jsp" method="post" style="display:inline;">
+                            <form action="${pageContext.request.contextPath}/modificarPedido" method="get" style="display:inline;">
                                 <input type="hidden" name="idPedido" value="<%= pedidoJson.get("identificador").getAsInt()%>">
                                 <button type="submit" class="btn btn-warning">Modificar Pedido</button>
                             </form>
+
                             <form action="${pageContext.request.contextPath}/cancelarPedido" method="post" style="display:inline;" onsubmit="return confirmarCancelacion();">
                                 <input type="hidden" name="idPedido" value="<%= pedidoJson.get("identificador").getAsInt()%>">
                                 <button type="submit" class="btn btn-danger">Cancelar Pedido</button>
@@ -261,5 +277,6 @@
                 document.getElementById("overlay").style.display = "none";
             }
         </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>

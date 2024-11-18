@@ -8,6 +8,7 @@
         return;
     }
     String usuario = (String) session.getAttribute("usuario");
+    int idVendedor = (Integer) session.getAttribute("idVendedor");
 %>
 
 <!DOCTYPE html>
@@ -16,12 +17,13 @@
         <meta charset="UTF-8">
         <title>Ver Carrito</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-        <!-- Incluir SweetAlert2 desde CDN -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="Styles/verCarrito.css">
     </head>
     <body>
+        <div id="data-vendedor" data-idVendedor="<%= idVendedor %>"></div> <!--para obtener el idVendedor en js-->
+        
         <header class="p-3 bg-dark text-white d-flex justify-content-between align-items-center">
             <button id="openMenuBtn" onclick="openMenu()" class="btn btn-light">☰ Menú</button>
             <div class="encabezado">

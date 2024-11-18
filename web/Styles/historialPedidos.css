@@ -186,12 +186,3 @@ tr:hover {
     background-color: #ddd; /* Fondo gris más oscuro al pasar el mouse */
 }
 
-.btn {
-    display: inline-block;
-    padding: 10px 15px;
-    text-decoration: none;
-    border-radius: 5px;
-    border: none; /* Sin borde */
-    cursor: pointer; /* Cambiar cursor al pasar por encima */
-    font-weight: bold; /* Texto en negrita */
-}

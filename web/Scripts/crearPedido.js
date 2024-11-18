@@ -281,8 +281,16 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        fetch(`buscarProducto?sku=${sku || ''}&nombre=${nombre || ''}`)
-                .then(response => response.json())
+        // URL del endpoint con los parámetros SKU y nombre
+        const url = `http://localhost:8080/rest/api/productos/buscarProducto?sku=${sku || ''}&nombre=${nombre || ''}`;
+
+        fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Error en la respuesta del servidor.");
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     resultadoBusqueda.innerHTML = '';
 
@@ -296,16 +304,16 @@ document.addEventListener("DOMContentLoaded", function () {
                             const card = document.createElement("div");
                             card.classList.add("col-md-3", "mb-4");
 
-                            const byteArray = new Uint8Array(producto.imagen);
-                            const blob = new Blob([byteArray], {type: 'image/jpeg'});
-                            const imageUrl = URL.createObjectURL(blob);
+                            // Convertir byte[] a base64
+                            //const byteArray = new Uint8Array(producto.imagen);
+                            //const binaryString = byteArray.reduce((acc, byte) => acc + String.fromCharCode(byte), '');
+                            //const base64Image = btoa(binaryString);
 
                             card.innerHTML = `
                             <div class="card h-100">
-                                <img src="${imageUrl}" class="card-img-top img-fluid" style="max-height: 300px; object-fit: cover;" alt="${producto.nombre}">
                                 <div class="card-body">
                                     <h5 class="card-title">${producto.nombre}</h5>
-                                    <p class="card-text">SKU: ${producto.SKU}</p>
+                                    <p class="card-text">SKU: ${producto.sku}</p>
                                     <p class="card-text">Precio: $${producto.precioVenta}</p>
                                     <p class="card-text">Stock: ${producto.stock}</p>
                                     <input type="number" class="form-control mb-2" id="cantidad" value="1" min="1" max="${producto.stock}">
@@ -327,7 +335,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Función para añadir el producto al carrito
         window.addToCart = function (productId, productName, productPrice, stock) {
-            // Verificar si un cliente ha sido seleccionado
             const clienteLocalStorage = localStorage.getItem("clienteId");
 
             if (!clienteLocalStorage) {
@@ -344,43 +351,32 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (cantidad < 1 || cantidad > stock) {
                 Swal.fire("Error", "Cantidad no válida.", "error");
-                //alert("Cantidad no válida.");
                 return;
             }
 
             const clienteId = localStorage.getItem("clienteId");
             let carrito = JSON.parse(localStorage.getItem("carrito_" + clienteId)) || [];
 
-            // Crear el objeto del producto que se añadirá al carrito
             const producto = {
-                id: productId, // ID del producto
-                name: productName, // Nombre del producto
-                price: productPrice, // Precio del producto
-                quantity: cantidad   // Cantidad seleccionada
+                id: productId,
+                name: productName,
+                price: productPrice,
+                quantity: cantidad
             };
 
-            // Agregar el producto al carrito
-            // Verificar si el producto ya está en el carrito
             const index = carrito.findIndex(item => item.id === productId);
             if (index > -1) {
-                // Si el producto ya existe, actualizar la cantidad
                 carrito[index].quantity += cantidad;
             } else {
-                // Si no existe, agregar el producto al carrito
                 carrito.push(producto);
             }
 
-            // Guardar el carrito actualizado en localStorage
             localStorage.setItem("carrito_" + clienteId, JSON.stringify(carrito));
-            // Actualizar el precio del carrito
             updateTotalCarrito();
-            // Limpiar los campos de búsqueda (SKU y Nombre)
-            document.getElementById("buscarPorSKU").value = '';
-            document.getElementById("buscarPorNombre").value = '';
-            document.getElementById("buscarPorSKU").disabled = false;
-            document.getElementById("buscarPorNombre").disabled = false;
-            // Limpiar las cards de productos encontrados
-            const resultadoBusqueda = document.getElementById("resultadoBusqueda");
+            skuInput.value = '';
+            nombreInput.value = '';
+            skuInput.disabled = false;
+            nombreInput.disabled = false;
             resultadoBusqueda.innerHTML = '';
 
             Swal.fire({
@@ -388,13 +384,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 title: 'Producto añadido',
                 timer: 2000,
                 text: `${productName} ha sido añadido al carrito.`,
-            }).then(() => {
-
             });
 
-            // Imprimir el mensaje en la consola
             console.log(`Producto añadido al carrito: ${productId}, Nombre: ${productName}, Cantidad: ${cantidad}, Precio: ${productPrice}`);
-        }
+        };
 
         function updateTotalCarrito() {
             const clienteId = localStorage.getItem("clienteId");

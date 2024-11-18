@@ -109,7 +109,7 @@
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
                     <!-- Formulario para modificar pedido -->
                     <li>
-                        <form action="${pageContext.request.contextPath}/Vistas/modificarPedido.jsp" method="post" style="margin: 0;">
+                        <form action="${pageContext.request.contextPath}/actualizarPedido" method="get" style="margin: 0;">
                             <input type="hidden" name="idPedido" value="<%= pedido%>">
                             <button type="submit" class="dropdown-item">Modificar Pedido</button>
                         </form>
