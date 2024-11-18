@@ -5,9 +5,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import logica.Clases.Pedido;
-import logica.Clases.DetallePedido;
-import logica.Clases.Producto;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -19,17 +16,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import logica.Fabrica;
-import logica.Interfaces.IControladorDetallePedido;
-import logica.Interfaces.IControladorPedido;
-import logica.Interfaces.IControladorProducto;
 
 @WebServlet("/modificarPedido")
 public class ModificarPedidoServlet extends HttpServlet {
 
-    private IControladorPedido ICP = Fabrica.getInstance().getIControladorPedido();
-    private IControladorDetallePedido ICDP = Fabrica.getInstance().getIControladorDetallePedido();
-    private IControladorProducto ICPr = Fabrica.getInstance().getIControladorProducto();
     private int pedidoId;
 
     @Override
@@ -86,7 +76,7 @@ public class ModificarPedidoServlet extends HttpServlet {
         try {
             // Obtener y convertir parámetros obligatorios
             int idPedido = Integer.parseInt(request.getParameter("idPedido"));
-            Pedido.Estado estadoPedido = Pedido.Estado.valueOf(request.getParameter("estadoPedido"));
+            String estadoPedido = request.getParameter("estadoPedido");
             int idVendedor = Integer.parseInt(request.getParameter("idVendedor"));
             int idCliente = Integer.parseInt(request.getParameter("idCliente"));
 
@@ -110,7 +100,7 @@ public class ModificarPedidoServlet extends HttpServlet {
             // Crear un nuevo objeto PedidoRequest que será enviado al endpoint
             JsonObject pedidoRequest = new JsonObject();
             pedidoRequest.addProperty("idPedido", idPedido);
-            pedidoRequest.addProperty("estadoPedido", estadoPedido.name());
+            pedidoRequest.addProperty("estadoPedido", estadoPedido);
             pedidoRequest.addProperty("idVendedor", idVendedor);
             pedidoRequest.addProperty("idCliente", idCliente);
             pedidoRequest.addProperty("totalPedido", totalPedido);

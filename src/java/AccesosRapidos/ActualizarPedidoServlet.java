@@ -14,18 +14,10 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import logica.Clases.Pedido;
-import logica.Fabrica;
-import logica.Interfaces.IControladorDetallePedido;
-import logica.Interfaces.IControladorPedido;
-import logica.Interfaces.IControladorProducto;
 
 @WebServlet("/actualizarPedido")
 public class ActualizarPedidoServlet extends HttpServlet {
 
-    private IControladorPedido ICP = Fabrica.getInstance().getIControladorPedido();
-    private IControladorDetallePedido ICDP = Fabrica.getInstance().getIControladorDetallePedido();
-    private IControladorProducto ICPr = Fabrica.getInstance().getIControladorProducto();
     private int pedidoId;
 
     @Override
@@ -82,7 +74,7 @@ public class ActualizarPedidoServlet extends HttpServlet {
         try {
             // Obtener y convertir parámetros obligatorios
             int idPedido = Integer.parseInt(request.getParameter("idPedido"));
-            Pedido.Estado estadoPedido = Pedido.Estado.valueOf(request.getParameter("estadoPedido"));
+            String estadoPedido = request.getParameter("estadoPedido");
             int idVendedor = Integer.parseInt(request.getParameter("idVendedor"));
             int idCliente = Integer.parseInt(request.getParameter("idCliente"));
 
@@ -106,7 +98,7 @@ public class ActualizarPedidoServlet extends HttpServlet {
             // Crear un nuevo objeto PedidoRequest que será enviado al endpoint
             JsonObject pedidoRequest = new JsonObject();
             pedidoRequest.addProperty("idPedido", idPedido);
-            pedidoRequest.addProperty("estadoPedido", estadoPedido.name());
+            pedidoRequest.addProperty("estadoPedido", estadoPedido);
             pedidoRequest.addProperty("idVendedor", idVendedor);
             pedidoRequest.addProperty("idCliente", idCliente);
             pedidoRequest.addProperty("totalPedido", totalPedido);
