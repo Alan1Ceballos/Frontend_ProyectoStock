@@ -200,7 +200,7 @@
         <script>
             function confirmarCancelacion() {
                 var idPedido = document.querySelector("input[name='idPedido']").value; // Obtener el ID del formulario
-                return confirm("¿Estás seguro de que deseas cancelar el pedido con ID: " + idPedido + "?");
+                return confirm("¿Estás seguro de que deseas cancelar el pedido?");
             }
         </script>
         <script>
