@@ -11,11 +11,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 
 @WebServlet("/modificarPedido")
 public class ModificarPedidoServlet extends HttpServlet {
@@ -80,6 +75,8 @@ public class ModificarPedidoServlet extends HttpServlet {
             int idVendedor = Integer.parseInt(request.getParameter("idVendedor"));
             int idCliente = Integer.parseInt(request.getParameter("idCliente"));
 
+            this.pedidoId = idPedido;
+            
             // Validar y capturar el total del pedido
             String totalPedidoStr = request.getParameter("totalPedido");
             float totalPedido = 0.0f; // Inicializa en 0.0f
@@ -118,7 +115,7 @@ public class ModificarPedidoServlet extends HttpServlet {
             if (responseApi != null && responseApi.get("statusCode").getAsInt() == 200) {
                 // Si el código es 200, considerar la operación como exitosa
                 // Redirigir a la página de historial de pedidos
-                response.sendRedirect(request.getContextPath() + "/historialpedidos");
+                response.sendRedirect(request.getContextPath() + "/verdetalles?idPedido=" + this.pedidoId);
             } else {
                 // Si la respuesta no es exitosa, obtener el mensaje de error
                 String errorMessage = responseApi.has("error") ? responseApi.get("error").getAsString() : "Error desconocido";
@@ -136,7 +133,7 @@ public class ModificarPedidoServlet extends HttpServlet {
             request.setAttribute("mensaje", "Error: Estado de pedido no válido.");
             request.getRequestDispatcher("/errorPage.jsp").forward(request, response);
         } catch (Exception e) {
-            response.sendRedirect(request.getContextPath() + "/historialpedidos");
+            response.sendRedirect(request.getContextPath() + "/verdetalles?idPedido=" + this.pedidoId);
         }
     }
 

@@ -78,6 +78,8 @@ public class ActualizarPedidoServlet extends HttpServlet {
             int idVendedor = Integer.parseInt(request.getParameter("idVendedor"));
             int idCliente = Integer.parseInt(request.getParameter("idCliente"));
 
+            this.pedidoId = idPedido;
+            
             // Validar y capturar el total del pedido
             String totalPedidoStr = request.getParameter("totalPedido");
             float totalPedido = 0.0f; // Inicializa en 0.0f
