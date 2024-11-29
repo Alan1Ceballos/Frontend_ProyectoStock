@@ -32,7 +32,7 @@ public class VerInformeServlet extends HttpServlet {
                 int anio = Integer.parseInt(anioParam);
 
                 // Construir la URL del endpoint
-                StringBuilder pathBuilder = new StringBuilder("/ventas/informe/"); // Ruta del endpoint "ventas"
+                StringBuilder pathBuilder = new StringBuilder("/ventas/informe/");
                 pathBuilder.append(idVendedor)
                         .append("?mes=").append(mes)
                         .append("&anio=").append(anio);

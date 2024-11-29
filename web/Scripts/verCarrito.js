@@ -58,11 +58,19 @@ document.addEventListener("DOMContentLoaded", function () {
     carritoContainer.addEventListener("click", function (event) {
         if (event.target.classList.contains("btn-remove")) {
             const index = event.target.getAttribute("data-index");
-            carrito.splice(index, 1);  // Eliminar el producto del carrito
-            localStorage.setItem("carrito", JSON.stringify(carrito));  // Actualizar localStorage
-            mostrarCarrito();  // Volver a mostrar el carrito
+
+            // Eliminar el producto del carrito en memoria
+            carrito.splice(index, 1);
+
+            // Actualizar el carrito en localStorage
+            localStorage.setItem(`carrito_${clienteId}`, JSON.stringify(carrito));
+
+            // Volver a mostrar el carrito actualizado
+            mostrarCarrito();
         }
     });
+
+
 
     // Evento para confirmar el pedido
     document.getElementById("confirmarPedido").addEventListener("click", function () {
@@ -105,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Crear el cuerpo de la solicitud
         const body = JSON.stringify({
             clienteId: clienteId, // Se envía como string
-            carrito: carrito,      // Asegúrate de que `carrito` esté correctamente estructurado
+            carrito: carrito, // Asegúrate de que `carrito` esté correctamente estructurado
             idVendedor: idVendedor
         });
 
